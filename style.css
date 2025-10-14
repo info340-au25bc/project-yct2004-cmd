@@ -40,11 +40,6 @@ section h2 {
     margin-bottom: 20px;
 }
 
-section h3 {
-    color: #34495e;
-    margin-top: 25px;
-    margin-bottom: 15px;
-}
 p {
     margin-bottom: 15px;
     text-align: justify;
@@ -67,10 +62,5 @@ ul {
 }
 
 ul li {
-    margin-bottom: 15px;
+    margin-bottom: 10px;
 }
-
-ul li strong {
-    color: #2c3e50;
-}
-
