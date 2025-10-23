@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Chuantong Yang , Visar Mecaj">
+    <link rel="stylesheet" href="css/proposal.css">
+    <title>Cybersecurity Education Platform - Group creation</title>
+</head>
+<body>
+    <header>
+        <h1>Welcome to the Cybersecurity Education Platform</h1>
+        <nav role="navigation" aria-label="Main page navigation">
+            <form role="search" aria-label="Page navigation">
+                <label for="page-search" class="visually-hidden">Navigate to page:</label>
+                <input type="text" id="page-search" name="page-search" list="pages" placeholder="Go to...">
+                <div class="search-links">
+                    <a href="groupcreation.html">Create a group</a>
+                    <a href="index.html">Ranking</a>
+                    <a href="about.html">Test</a>
+                    <a href="resources.html">Resources</a>
+                </div>
+            </form>
+        </nav>
+    </header>
+    <main>
+        <h1>Create a Study Group</h1>
+        <section>
+            <form action="#" method="post">
+            <label for="group-name">Group Name:</label>
+            <input type="text" id="group-name" name="group-name" required>
+        </section>
+        <section>
+            <label for="group-description">Group Description:</label>
+            <textarea id="group-description" name="group-description"></textarea>
+        </section>
+        <section>
+            <label for="resource-selection">Select a Resource for Your Group:</label>
+            
+            <select id="resource-selection" name="resource-selection" required>
+                <option>--Please choose an option--</option>
+                <!-- Recommended Cybersecurity Resources -->
+                <option value="professormesser">Professor Messer Security+ Course</option>
+                <option value="comptia-study-guide">CompTIA Security+ Study Guide</option>
+                <option value="cybrary">Cybrary</option>
+                <option value="udemy">Udemy Cybersecurity Courses</option>
+                <option value="coursera">Coursera Cybersecurity Specializations</option>
+                <option value="sans-training">SANS Security Awareness Training</option>
+
+                <!-- Tools & Services -->
+                <option value="cisa-tools">CISA Free Cybersecurity Services & Tools</option>
+                <option value="cybersectools">CybersecTools - 2600+ Free Tools</option>
+                <option value="purplesec">PurpleSec - Free Tools for Small Businesses</option>
+                <option value="knowbe4">KnowBe4 - Free Awareness & Phishing Tools</option>
+
+                <!-- Learning & Training -->
+                <option value="nist-courses">NIST - Free & Low-Cost Cybersecurity Courses</option>
+                <option value="openlearn">OpenLearn - Intro to Cybersecurity</option>
+            </select>
+        </section>
+            <button type="submit">Create Group</button>
