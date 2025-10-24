@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <!-- Cybersecurity Education Platform - INFO 340 Project -->
 <!-- Created by: Chuantong Yang & Visar Krasniqi -->
@@ -14,13 +15,13 @@
 <body>
     <header>
         <h1>Cybersecurity Education Platform</h1>
-        <nav role="navigation" aria-label="Main page navigation">
+        <nav>
             <ul class="nav-links">
                 <li><a href="index.html">Leaderboard</a></li>
                 <li><a href="quiz.html">Take Quiz</a></li>
                 <li><a href="groupcreation.html">Create Group</a></li>
                 <li><a href="resources.html">Resources</a></li>
-                <li><a href="ranking.html" aria-current="page">Rankings</a></li>
+                <li><a href="ranking.html">Rankings</a></li>
             </ul>
         </nav>
     </header>
@@ -34,43 +35,16 @@
 
         <section class="ranking-filters">
             <h2>Filter Rankings</h2>
-            <form role="search" aria-label="Filter rankings">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="time-period">Time Period:</label>
-                        <select id="time-period" name="time-period">
-                            <option value="all-time">All Time</option>
-                            <option value="this-month">This Month</option>
-                            <option value="this-week">This Week</option>
-                            <option value="today">Today</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="category">Category:</label>
-                        <select id="category" name="category">
-                            <option value="overall">Overall Score</option>
-                            <option value="network-security">Network Security</option>
-                            <option value="cryptography">Cryptography</option>
-                            <option value="incident-response">Incident Response</option>
-                            <option value="risk-management">Risk Management</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="difficulty">Difficulty Level:</label>
-                        <select id="difficulty" name="difficulty">
-                            <option value="all">All Levels</option>
-                            <option value="beginner">Beginner</option>
-                            <option value="intermediate">Intermediate</option>
-                            <option value="advanced">Advanced</option>
-                        </select>
-                    </div>
-                </div>
-                <button type="submit">Update Rankings</button>
-            </form>
+            <div class="filter-options">
+                <p><strong>Time Period:</strong> All Time | This Month | This Week | Today</p>
+                <p><strong>Category:</strong> Overall Score | Network Security | Cryptography | Incident Response</p>
+                <p><strong>Difficulty:</strong> All Levels | Beginner | Intermediate | Advanced</p>
+            </div>
         </section>
 
         <section class="top-performers">
             <h2>🏆 Top Performers</h2>
+            
             <div class="ranking-container">
                 <div class="ranking-item rank-1">
                     <div class="rank-badge">1st</div>
@@ -88,14 +62,14 @@
                     <div class="score-info">
                         <div class="score">2,847 pts</div>
                         <div class="score-breakdown">
-                            <span>Quizzes: 1,200 pts</span>
-                            <span>Groups: 800 pts</span>
-                            <span>Resources: 847 pts</span>
+                            <p>Quizzes: 1,200 pts</p>
+                            <p>Groups: 800 pts</p>
+                            <p>Resources: 847 pts</p>
                         </div>
                     </div>
                 </div>
 
-                <div class="ranking-item rank-2"
+                <div class="ranking-item rank-2">
                     <div class="rank-badge">2nd</div>
                     <div class="user-info">
                         <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?w=60&h=60&fit=crop&crop=face" alt="Profile picture of second place user" class="profile-pic">
@@ -111,9 +85,9 @@
                     <div class="score-info">
                         <div class="score">2,634 pts</div>
                         <div class="score-breakdown">
-                            <span>Quizzes: 1,100 pts</span>
-                            <span>Groups: 900 pts</span>
-                            <span>Resources: 634 pts</span>
+                            <p>Quizzes: 1,100 pts</p>
+                            <p>Groups: 900 pts</p>
+                            <p>Resources: 634 pts</p>
                         </div>
                     </div>
                 </div>
@@ -134,9 +108,9 @@
                     <div class="score-info">
                         <div class="score">2,421 pts</div>
                         <div class="score-breakdown">
-                            <span>Quizzes: 1,000 pts</span>
-                            <span>Groups: 750 pts</span>
-                            <span>Resources: 671 pts</span>
+                            <p>Quizzes: 1,000 pts</p>
+                            <p>Groups: 750 pts</p>
+                            <p>Resources: 671 pts</p>
                         </div>
                     </div>
                 </div>
@@ -145,142 +119,111 @@
 
         <section class="detailed-rankings">
             <h2>📊 Complete Rankings</h2>
-            <div class="rankings-table">
-                <div class="table-header">
-                    <div class="col-rank">Rank</div>
-                    <div class="col-user">User</div>
-                    <div class="col-score">Score</div>
-                    <div class="col-quizzes">Quizzes</div>
-                    <div class="col-groups">Groups</div>
-                    <div class="col-streak">Streak</div>
+            
+            <div class="ranking-list">
+                <div class="ranking-row">
+                    <p><strong>Rank 4:</strong> Emma Davis - 2,198 pts</p>
+                    <p>Quizzes: 45 | Groups: 3 | Streak: 8 days</p>
                 </div>
                 
-                <div class="table-row">
-                    <div class="col-rank">4</div>
-                    <div class="col-user">
-                        <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=40&h=40&fit=crop&crop=face" alt="Emma Davis profile" class="table-avatar">
-                        <span>Emma Davis</span>
-                    </div>
-                    <div class="col-score">2,198 pts</div>
-                    <div class="col-quizzes">45</div>
-                    <div class="col-groups">3</div>
-                    <div class="col-streak">8 days</div>
+                <div class="ranking-row">
+                    <p><strong>Rank 5:</strong> David Kim - 2,045 pts</p>
+                    <p>Quizzes: 38 | Groups: 2 | Streak: 12 days</p>
                 </div>
                 
-                <div class="table-row">
-                    <div class="col-rank">5</div>
-                    <div class="col-user">
-                        <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=40&h=40&fit=crop&crop=face" alt="David Kim profile" class="table-avatar">
-                        <span>David Kim</span>
-                    </div>
-                    <div class="col-score">2,045 pts</div>
-                    <div class="col-quizzes">38</div>
-                    <div class="col-groups">2</div>
-                    <div class="col-streak">12 days</div>
+                <div class="ranking-row">
+                    <p><strong>Rank 6:</strong> Lisa Wang - 1,892 pts</p>
+                    <p>Quizzes: 42 | Groups: 4 | Streak: 5 days</p>
                 </div>
                 
-                <div class="table-row">
-                    <div class="col-rank">6</div>
-                    <div class="col-user">
-                        <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?w=40&h=40&fit=crop&crop=face" alt="Lisa Wang profile" class="table-avatar">
-                        <span>Lisa Wang</span>
-                    </div>
-                    <div class="col-score">1,892 pts</div>
-                    <div class="col-quizzes">42</div>
-                    <div class="col-groups">4</div>
-                    <div class="col-streak">5 days</div>
+                <div class="ranking-row">
+                    <p><strong>Rank 7:</strong> James Wilson - 1,756 pts</p>
+                    <p>Quizzes: 35 | Groups: 2 | Streak: 3 days</p>
                 </div>
                 
-                <div class="table-row">
-                    <div class="col-rank">7</div>
-                    <div class="col-user">
-                        <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face" alt="James Wilson profile" class="table-avatar">
-                        <span>James Wilson</span>
-                    </div>
-                    <div class="col-score">1,756 pts</div>
-                    <div class="col-quizzes">35</div>
-                    <div class="col-groups">2</div>
-                    <div class="col-streak">3 days</div>
+                <div class="ranking-row">
+                    <p><strong>Rank 8:</strong> Maria Garcia - 1,634 pts</p>
+                    <p>Quizzes: 28 | Groups: 3 | Streak: 6 days</p>
                 </div>
                 
-                <div class="table-row">
-                    <div class="col-rank">8</div>
-                    <div class="col-user">
-                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face" alt="Maria Garcia profile" class="table-avatar">
-                        <span>Maria Garcia</span>
-                    </div>
-                    <div class="col-score">1,634 pts</div>
-                    <div class="col-quizzes">28</div>
-                    <div class="col-groups">3</div>
-                    <div class="col-streak">6 days</div>
+                <div class="ranking-row">
+                    <p><strong>Rank 9:</strong> Robert Lee - 1,523 pts</p>
+                    <p>Quizzes: 31 | Groups: 2 | Streak: 4 days</p>
+                </div>
+                
+                <div class="ranking-row">
+                    <p><strong>Rank 10:</strong> Jennifer Taylor - 1,445 pts</p>
+                    <p>Quizzes: 27 | Groups: 3 | Streak: 9 days</p>
                 </div>
             </div>
         </section>
 
         <section class="achievement-stats">
             <h2>🏅 Achievement Statistics</h2>
-            <div class="achievement-grid">
-                <div class="achievement-card">
+            <div class="stats-grid">
+                <div class="stat-card">
                     <h3>🥇 Quiz Masters</h3>
                     <p>Users with 50+ quizzes completed</p>
-                    <div class="achievement-count">127</div>
+                    <p class="stat-number">127 users</p>
                 </div>
                 
-                <div class="achievement-card">
+                <div class="stat-card">
                     <h3>🔥 Streak Champions</h3>
                     <p>Users with 30+ day streaks</p>
-                    <div class="achievement-count">23</div>
+                    <p class="stat-number">23 users</p>
                 </div>
                 
-                <div class="achievement-card">
+                <div class="stat-card">
                     <h3>📚 Study Leaders</h3>
                     <p>Users who created 5+ study groups</p>
-                    <div class="achievement-count">45</div>
+                    <p class="stat-number">45 users</p>
                 </div>
                 
-                <div class="achievement-card">
+                <div class="stat-card">
                     <h3>🎯 Perfect Scores</h3>
                     <p>Users with 100% quiz scores</p>
-                    <div class="achievement-count">89</div>
+                    <p class="stat-number">89 users</p>
                 </div>
             </div>
         </section>
 
         <section class="your-ranking">
-            <h2>Your Ranking</h2>
-            <div class="user-ranking-card">
-                <div class="user-rank-info">
-                    <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=60&h=60&fit=crop&crop=face" alt="Your profile picture" class="profile-pic">
-                    <div class="user-details">
-                        <h3>Your Name</h3>
-                        <p>Current Rank: #15</p>
-                        <div class="progress-info">
-                            <span>Points to next rank: 156 pts</span>
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: 68%"></div>
-                            </div>
-                        </div>
-                    </div>
+            <h2>Your Personal Ranking</h2>
+            <div class="user-card">
+                <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=80&h=80&fit=crop&crop=face" alt="Your profile picture" class="profile-pic">
+                <h3>Your Name</h3>
+                <p><strong>Current Rank:</strong> #15</p>
+                <p><strong>Total Score:</strong> 1,234 pts</p>
+                <p><strong>Quizzes Taken:</strong> 23</p>
+                <p><strong>Current Streak:</strong> 7 days</p>
+                <p><strong>Points to next rank:</strong> 156 pts</p>
+            </div>
+        </section>
+
+        <section class="platform-stats">
+            <h2>Platform Overview</h2>
+            <div class="overview-grid">
+                <div class="overview-card">
+                    <h3>1,247</h3>
+                    <p>Total Active Users</p>
                 </div>
-                <div class="user-stats">
-                    <div class="stat-item">
-                        <span class="stat-label">Total Score</span>
-                        <span class="stat-value">1,234 pts</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">Quizzes Taken</span>
-                        <span class="stat-value">23</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">Current Streak</span>
-                        <span class="stat-value">7 days</span>
-                    </div>
+                <div class="overview-card">
+                    <h3>15,892</h3>
+                    <p>Quizzes Completed</p>
+                </div>
+                <div class="overview-card">
+                    <h3>89</h3>
+                    <p>Study Groups</p>
+                </div>
+                <div class="overview-card">
+                    <h3>94%</h3>
+                    <p>Average Pass Rate</p>
                 </div>
             </div>
         </section>
     </main>
     
-    <footer role="contentinfo">
+    <footer>
         <div class="footer-content">
             <p>&copy; 2025 Cybersecurity Education Platform - INFO 340 Project</p>
             <p>Created by: Chuantong Yang & Visar Krasniqi</p>
@@ -289,4 +232,3 @@
     </footer>
 </body>
 </html>
-<!-- Updated by Chuantong Yang -->
