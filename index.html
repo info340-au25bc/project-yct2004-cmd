@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<!-- Cybersecurity Education Platform - INFO 340 Project -->
+<!-- Created by: Chuantong Yang & Visar Krasniqi -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Chuantong Yang, Visar Krasniqi - INFO 340 Project">
+    <meta name="description" content="Cybersecurity Education Platform - Interactive learning with quizzes, leaderboards, and study groups for cybersecurity certification preparation.">
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔒</text></svg>">
+    <link rel="stylesheet" href="css/proposal.css">
+    <title>Cybersecurity Education Platform - Leaderboard</title>
+</head>
+<body>
+    <header>
+        <h1>Cybersecurity Education Platform</h1>
+        <nav role="navigation" aria-label="Main page navigation">
+            <ul class="nav-links">
+                <li><a href="index.html" aria-current="page">Leaderboard</a></li>
+                <li><a href="quiz.html">Take Quiz</a></li>
+                <li><a href="groupcreation.html">Create Group</a></li>
+                <li><a href="resources.html">Resources</a></li>
+                <li><a href="ranking.html">Rankings</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <main>
+        <section class="hero-section">
+            <h2>Cybersecurity Learning Leaderboard</h2>
+            <p>Learn cybersecurity with others. Take quizzes and see how you rank!</p>
+            <img src="https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=600&h=300&fit=crop" alt="Cybersecurity learning" class="hero-image">
+        </section>
+
+        <section class="search-section">
+            <h2>Find Study Groups</h2>
+            <form role="search" aria-label="Search study groups">
+                <div class="form-group">
+                    <label for="group-search">Search Groups:</label>
+                    <input type="text" id="group-search" name="group-search" placeholder="Enter group name or topic..." required>
+                </div>
+                <div class="form-group">
+                    <label for="difficulty-filter">Difficulty Level:</label>
+                    <select id="difficulty-filter" name="difficulty-filter">
+                        <option value="">All Levels</option>
+                        <option value="beginner">Beginner</option>
+                        <option value="intermediate">Intermediate</option>
+                        <option value="advanced">Advanced</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="study-time">Preferred Study Time:</label>
+                    <select id="study-time" name="study-time">
+                        <option value="">Any Time</option>
+                        <option value="morning">Morning (6AM-12PM)</option>
+                        <option value="afternoon">Afternoon (12PM-6PM)</option>
+                        <option value="evening">Evening (6PM-12AM)</option>
+                    </select>
+                </div>
+                <button type="submit">Search Groups</button>
+            </form>
+        </section>
+
+        <section class="leaderboard-section">
+            <h2>Top Performers</h2>
+            <div class="leaderboard-container">
+                <div class="leaderboard-item rank-1">
+                    <div class="rank">1</div>
+                    <div class="user-info">
+                        <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=50&h=50&fit=crop&crop=face" alt="Profile picture of top user" class="profile-pic">
+                        <div class="user-details">
+                            <h3>Alex Chen</h3>
+                            <p>Security+ Student</p>
+                        </div>
+                    </div>
+                    <div class="score">2,847 pts</div>
+                </div>
+                
+                <div class="leaderboard-item rank-2">
+                    <div class="rank">2</div>
+                    <div class="user-info">
+                        <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?w=50&h=50&fit=crop&crop=face" alt="Profile picture of second place user" class="profile-pic">
+                        <div class="user-details">
+                            <h3>Sarah Johnson</h3>
+                            <p>CISSP Student</p>
+                        </div>
+                    </div>
+                    <div class="score">2,634 pts</div>
+                </div>
+                
+                <div class="leaderboard-item rank-3">
+                    <div class="rank">3</div>
+                    <div class="user-info">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=50&h=50&fit=crop&crop=face" alt="Profile picture of third place user" class="profile-pic">
+                        <div class="user-details">
+                            <h3>Mike Rodriguez</h3>
+                            <p>Network Student</p>
+                        </div>
+                    </div>
+                    <div class="score">2,421 pts</div>
+                </div>
+                
+                <div class="leaderboard-item">
+                    <div class="rank">4</div>
+                    <div class="user-info">
+                        <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=50&h=50&fit=crop&crop=face" alt="Profile picture of fourth place user" class="profile-pic">
+                        <div class="user-details">
+                            <h3>Emma Davis</h3>
+                            <p>Pen Test Student</p>
+                        </div>
+                    </div>
+                    <div class="score">2,198 pts</div>
+                </div>
+                
+                <div class="leaderboard-item">
+                    <div class="rank">5</div>
+                    <div class="user-info">
+                        <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=50&h=50&fit=crop&crop=face" alt="Profile picture of fifth place user" class="profile-pic">
+                        <div class="user-details">
+                            <h3>David Kim</h3>
+                            <p>Incident Student</p>
+                        </div>
+                    </div>
+                    <div class="score">2,045 pts</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="stats-section">
+            <h2>Platform Statistics</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>1,247</h3>
+                    <p>Active Learners</p>
+                    <div class="stat-trend">↗ +12% this month</div>
+                </div>
+                <div class="stat-card">
+                    <h3>89</h3>
+                    <p>Study Groups</p>
+                    <div class="stat-trend">↗ +5 new this week</div>
+                </div>
+                <div class="stat-card">
+                    <h3>2,156</h3>
+                    <p>Quizzes Completed</p>
+                    <div class="stat-trend">↗ +234 this week</div>
+                </div>
+                <div class="stat-card">
+                    <h3>94%</h3>
+                    <p>Pass Rate</p>
+                    <div class="stat-trend">↗ +2% improvement</div>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <footer role="contentinfo">
+        <div class="footer-content">
+            <p>&copy; 2025 Cybersecurity Education Platform - INFO 340 Project</p>
+            <p>Created by: Chuantong Yang & Visar Krasniqi</p>
+            <p>Contact: <a href="mailto:support@cybersec-edu.com">support@cybersec-edu.com</a></p>
+        </div>
+    </footer>
+</body>
+</html>
