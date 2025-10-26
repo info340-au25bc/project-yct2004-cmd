@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="author" content="Chuantong Yang , Visar Mecaj">
     <link rel="stylesheet" href="css/proposal.css">
-    <title>Cybersecurity Education Platform - Group creation</title>
+    <title>Create Study Group - Cybersecurity Education Platform</title>
 </head>
 <body>
     <header>
-        <h1>Welcome to the Cybersecurity Education Platform</h1>
+        <h1>Cybersecurity Education Platform</h1>
         <nav role="navigation" aria-label="Main page navigation">
             <form role="search" aria-label="Page navigation">
                 <label for="page-search" class="visually-hidden">Navigate to page:</label>
@@ -24,40 +24,129 @@
             </form>
         </nav>
     </header>
+    
     <main>
-        <h1>Create a Study Group</h1>
-        <section>
-            <form action="#" method="post">
-            <label for="group-name">Group Name:</label>
-            <input type="text" id="group-name" name="group-name" required>
+        <section class="hero-section">
+            <h2>Create a Study Group</h2>
+            <p>Form a study group with fellow cybersecurity learners. Choose a resource to focus on and collaborate to master the material together!</p>
+            <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=600&h=300&fit=crop" alt="Group of people collaborating and studying together" class="hero-image">
         </section>
-        <section>
-            <label for="group-description">Group Description:</label>
-            <textarea id="group-description" name="group-description"></textarea>
+
+        <section class="group-form-section">
+            <h2>Group Creation Form</h2>
+            <form action="#" method="post" role="form" aria-label="Create study group">
+                <div class="form-group">
+                    <label for="group-name">Group Name:</label>
+                    <input type="text" id="group-name" name="group-name" placeholder="e.g., Security+ Study Group" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="group-description">Group Description:</label>
+                    <textarea id="group-description" name="group-description" rows="4" placeholder="Describe your group's goals, study schedule, and target audience..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="resource-selection">Select a Resource for Your Group:</label>
+                    <select id="resource-selection" name="resource-selection" required>
+                        <option value="">--Please choose an option--</option>
+                        <!-- Recommended Cybersecurity Resources -->
+                        <option value="professormesser">Professor Messer Security+ Course</option>
+                        <option value="comptia-study-guide">CompTIA Security+ Study Guide</option>
+                        <option value="cybrary">Cybrary</option>
+                        <option value="udemy">Udemy Cybersecurity Courses</option>
+                        <option value="coursera">Coursera Cybersecurity Specializations</option>
+                        <option value="sans-training">SANS Security Awareness Training</option>
+
+                        <!-- Tools & Services -->
+                        <option value="cisa-tools">CISA Free Cybersecurity Services & Tools</option>
+                        <option value="cybersectools">CybersecTools - 2600+ Free Tools</option>
+                        <option value="purplesec">PurpleSec - Free Tools for Small Businesses</option>
+                        <option value="knowbe4">KnowBe4 - Free Awareness & Phishing Tools</option>
+
+                        <!-- Learning & Training -->
+                        <option value="nist-courses">NIST - Free & Low-Cost Cybersecurity Courses</option>
+                        <option value="openlearn">OpenLearn - Intro to Cybersecurity</option>
+                    </select>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="max-members">Maximum Members:</label>
+                        <input type="number" id="max-members" name="max-members" min="2" max="20" value="8" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="difficulty-level">Target Difficulty Level:</label>
+                        <select id="difficulty-level" name="difficulty-level" required>
+                            <option value="">Select difficulty...</option>
+                            <option value="beginner">Beginner</option>
+                            <option value="intermediate">Intermediate</option>
+                            <option value="advanced">Advanced</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="study-schedule">Preferred Study Schedule:</label>
+                        <select id="study-schedule" name="study-schedule" required>
+                            <option value="">Select schedule...</option>
+                            <option value="weekday-mornings">Weekday Mornings</option>
+                            <option value="weekday-evenings">Weekday Evenings</option>
+                            <option value="weekends">Weekends</option>
+                            <option value="flexible">Flexible</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="timezone">Timezone:</label>
+                        <select id="timezone" name="timezone" required>
+                            <option value="">Select timezone...</option>
+                            <option value="pst">Pacific (PST)</option>
+                            <option value="mst">Mountain (MST)</option>
+                            <option value="cst">Central (CST)</option>
+                            <option value="est">Eastern (EST)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <button type="submit" class="start-quiz-btn">Create Group</button>
+            </form>
         </section>
-        <section>
-            <label for="resource-selection">Select a Resource for Your Group:</label>
-            
-            <select id="resource-selection" name="resource-selection" required>
-                <option>--Please choose an option--</option>
-                <!-- Recommended Cybersecurity Resources -->
-                <option value="professormesser">Professor Messer Security+ Course</option>
-                <option value="comptia-study-guide">CompTIA Security+ Study Guide</option>
-                <option value="cybrary">Cybrary</option>
-                <option value="udemy">Udemy Cybersecurity Courses</option>
-                <option value="coursera">Coursera Cybersecurity Specializations</option>
-                <option value="sans-training">SANS Security Awareness Training</option>
 
-                <!-- Tools & Services -->
-                <option value="cisa-tools">CISA Free Cybersecurity Services & Tools</option>
-                <option value="cybersectools">CybersecTools - 2600+ Free Tools</option>
-                <option value="purplesec">PurpleSec - Free Tools for Small Businesses</option>
-                <option value="knowbe4">KnowBe4 - Free Awareness & Phishing Tools</option>
-
-                <!-- Learning & Training -->
-                <option value="nist-courses">NIST - Free & Low-Cost Cybersecurity Courses</option>
-                <option value="openlearn">OpenLearn - Intro to Cybersecurity</option>
-            </select>
+        <section class="existing-groups">
+            <h2>Join Existing Groups</h2>
+            <div class="groups-grid">
+                <div class="group-card">
+                    <h3>Security+ Fundamentals</h3>
+                    <p>Studying Professor Messer's Security+ course together. Perfect for beginners!</p>
+                    <div class="group-meta">
+                        <span class="members">5/8 members</span>
+                        <span class="difficulty beginner">Beginner</span>
+                    </div>
+                    <button type="button">Join Group</button>
+                </div>
+                
+                <div class="group-card">
+                    <h3>CISSP Study Group</h3>
+                    <p>Advanced cybersecurity professionals preparing for CISSP certification.</p>
+                    <div class="group-meta">
+                        <span class="members">3/6 members</span>
+                        <span class="difficulty advanced">Advanced</span>
+                    </div>
+                    <button type="button">Join Group</button>
+                </div>
+                
+                <div class="group-card">
+                    <h3>Network Security Basics</h3>
+                    <p>Learning network security fundamentals through hands-on labs and discussions.</p>
+                    <div class="group-meta">
+                        <span class="members">7/10 members</span>
+                        <span class="difficulty intermediate">Intermediate</span>
+                    </div>
+                    <button type="button">Join Group</button>
+                </div>
+            </div>
         </section>
         <section>
             <label for="group-members">Add Members (username separated by commas):</label>
