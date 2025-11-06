@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Chuantong Yang, Visar Mecaj">
+    <meta name="description" content="Take interactive cybersecurity quizzes to test your knowledge and earn points on the leaderboard.">
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔒</text></svg>">
+    <link rel="stylesheet" href="css/proposal.css">
+    <title>Cybersecurity Quiz - Test Your Knowledge</title>
+</head>
+<body>
+    <header>
+        <h1>Cybersecurity Education Platform</h1>
+        <nav role="navigation" aria-label="Main page navigation">
+            <ul class="nav-links">
+                <li><a href="index.html">Leaderboard</a></li>
+                <li><a href="quiz.html" aria-current="page">Take Quiz</a></li>
+                <li><a href="groupcreation.html">Create Group</a></li>
+                <li><a href="resources.html">Resources</a></li>
+                <li><a href="ranking.html">Rankings</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <main>
+        <section class="quiz-intro">
+            <h2>Cybersecurity Knowledge Quiz</h2>
+            <p>Test your cybersecurity knowledge with our interactive quiz. Choose your difficulty level and topic area to get started!</p>
+            <div class="quiz-features">
+                <div class="feature-item">
+                    <h3>📊 Instant Feedback</h3>
+                    <p>Get immediate explanations for correct and incorrect answers</p>
+                </div>
+                <div class="feature-item">
+                    <h3>🏆 Points System</h3>
+                    <p>Earn points for correct answers and climb the leaderboard</p>
+                </div>
+                <div class="feature-item">
+                    <h3>📚 Multiple Topics</h3>
+                    <p>Cover network security, cryptography, incident response, and more</p>
+                </div>
+            </div>
+            <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=300&fit=crop" alt="Cybersecurity quiz interface with multiple choice questions" class="quiz-hero-image">
+        </section>
+
+        <section class="quiz-selection">
+            <h2>Quiz Configuration</h2>
+            <form action="#" method="post" role="form" aria-label="Quiz configuration">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="quiz-topic">Select Topic:</label>
+                        <select id="quiz-topic" name="quiz-topic" required>
+                            <option value="">Choose a topic...</option>
+                            <option value="network-security">Network Security</option>
+                            <option value="cryptography">Cryptography</option>
+                            <option value="incident-response">Incident Response</option>
+                            <option value="risk-management">Risk Management</option>
+                            <option value="compliance">Compliance & Governance</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="difficulty-level">Difficulty Level:</label>
+                        <select id="difficulty-level" name="difficulty-level" required>
+                            <option value="">Select difficulty...</option>
+                            <option value="beginner">Beginner</option>
+                            <option value="intermediate">Intermediate</option>
+                            <option value="advanced">Advanced</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="question-count">Number of Questions:</label>
+                    <input type="number" id="question-count" name="question-count" min="5" max="20" value="10" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="time-limit">Time Limit (minutes):</label>
+                    <input type="number" id="time-limit" name="time-limit" min="5" max="60" value="15" required>
+                </div>
+                
+                <button type="submit" class="start-quiz-btn">Start Quiz</button>
+            </form>
+        </section>
+
+        <section class="sample-question">
+            <h2>Sample Question</h2>
+            <div class="question-card">
+                <div class="question-header">
+                    <span class="question-number">1</span>
+                    <span class="question-topic">Network Security</span>
+                </div>
+                <p class="question-text">What is the primary purpose of a firewall in network security?</p>
+                <div class="answer-options">
+                    <label class="option">
+                        <input type="radio" name="sample-question" value="a">
+                        <span class="option-text">To encrypt data transmission</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="sample-question" value="b">
+                        <span class="option-text">To monitor and control incoming and outgoing network traffic</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="sample-question" value="c">
+                        <span class="option-text">To authenticate users</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="sample-question" value="d">
+                        <span class="option-text">To backup data</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button type="button" class="submit-answer-btn">Submit Answer</button>
+                    <button type="button" class="skip-question-btn">Skip Question</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="quiz-stats">
+            <h2>Your Quiz Performance</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>127</h3>
+                    <p>Quizzes Completed</p>
+                </div>
+                <div class="stat-card">
+                    <h3>89%</h3>
+                    <p>Average Score</p>
+                </div>
+                <div class="stat-card">
+                    <h3>2,847</h3>
+                    <p>Total Points</p>
+                </div>
+                <div class="stat-card">
+                    <h3>15</h3>
+                    <p>Current Streak</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="recent-quizzes">
+            <h2>Recent Quiz Results</h2>
+            <div class="quiz-history">
+                <div class="quiz-result">
+                    <div class="quiz-info">
+                        <h3>Network Security Fundamentals</h3>
+                        <p>Completed: 2 hours ago</p>
+                    </div>
+                    <div class="quiz-score">
+                        <span class="score">92%</span>
+                        <span class="points">+150 pts</span>
+                    </div>
+                </div>
+                
+                <div class="quiz-result">
+                    <div class="quiz-info">
+                        <h3>Cryptography Basics</h3>
+                        <p>Completed: Yesterday</p>
+                    </div>
+                    <div class="quiz-score">
+                        <span class="score">85%</span>
+                        <span class="points">+120 pts</span>
+                    </div>
+                </div>
+                
+                <div class="quiz-result">
+                    <div class="quiz-info">
+                        <h3>Incident Response</h3>
+                        <p>Completed: 3 days ago</p>
+                    </div>
+                    <div class="quiz-score">
+                        <span class="score">78%</span>
+                        <span class="points">+95 pts</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <footer role="contentinfo">
+        <div class="footer-content">
+            <p>&copy; 2025 Cybersecurity Education Platform. All rights reserved.</p>
+            <p>Contact: <a href="mailto:support@cybersec-edu.com">support@cybersec-edu.com</a></p>
+        </div>
+    </footer>
+</body>
+</html>
+
