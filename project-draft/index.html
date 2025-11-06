@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Chuantong Yang, Visar Krasniqi">
+    <meta name="description" content="CyberLearn - Cybersecurity Education Platform with interactive quizzes, study groups, and community-driven learning">
+    <title>CyberLearn - Cybersecurity Education Platform</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="nav-brand">
+                <img src="img/shield-icon.png" alt="CyberLearn Shield Logo" class="logo">
+                <h1>CyberLearn</h1>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#home" class="nav-link active" data-section="home">Home</a></li>
+                <li><a href="#quiz" class="nav-link" data-section="quiz">Quizzes</a></li>
+                <li><a href="#leaderboard" class="nav-link" data-section="leaderboard">Leaderboard</a></li>
+                <li><a href="#resources" class="nav-link" data-section="resources">Resources</a></li>
+                <li><a href="#profile" class="nav-link" data-section="profile">Profile</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <!-- HOME SECTION -->
+        <section id="home" class="page-section active">
+            <!-- Hero Section -->
+            <div class="hero">
+                <div class="hero-content">
+                    <h2>Master Cybersecurity Through Interactive Learning</h2>
+                    <p>Join thousands of learners preparing for CompTIA Security+ and other cybersecurity certifications through community-driven quizzes, study groups, and expert-curated resources.</p>
+                    <div class="hero-buttons">
+                        <a href="#quiz" class="btn btn-primary" data-section="quiz">Start Learning</a>
+                        <a href="#resources" class="btn btn-secondary" data-section="resources">Browse Resources</a>
+                    </div>
+                </div>
+                <div class="hero-image">
+                    <img src="img/cybersecurity-hero.jpg" alt="Cybersecurity professionals working on computers" class="hero-img">
+                </div>
+            </div>
+
+            <!-- Search and Filter Section -->
+            <div class="search-section">
+                <h3>Find Your Perfect Study Material</h3>
+                <form class="search-form" role="search">
+                    <div class="form-group">
+                        <label for="search-topic">Search Topic</label>
+                        <input type="text" id="search-topic" name="topic" placeholder="e.g., Network Security, Cryptography" aria-label="Search for cybersecurity topics">
+                    </div>
+                    <div class="form-group">
+                        <label for="difficulty">Difficulty Level</label>
+                        <select id="difficulty" name="difficulty" aria-label="Select difficulty level">
+                            <option value="">All Levels</option>
+                            <option value="beginner">Beginner</option>
+                            <option value="intermediate">Intermediate</option>
+                            <option value="advanced">Advanced</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="certification">Certification</label>
+                        <select id="certification" name="certification" aria-label="Select certification type">
+                            <option value="">All Certifications</option>
+                            <option value="security-plus">CompTIA Security+</option>
+                            <option value="cissp">CISSP</option>
+                            <option value="ceh">CEH</option>
+                            <option value="cism">CISM</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-search">Search</button>
+                </form>
+            </div>
+
+            <!-- Featured Quizzes Section -->
+            <div class="featured-section">
+                <h3>Featured Quizzes</h3>
+                <div class="quiz-grid">
+                    <article class="quiz-card">
+                        <div class="quiz-image">
+                            <img src="img/network-security.jpg" alt="Network security diagram showing firewall and encryption" class="card-img">
+                        </div>
+                        <div class="quiz-content">
+                            <h4>Network Security Fundamentals</h4>
+                            <p>Test your knowledge of firewalls, VPNs, and network protocols. Perfect for Security+ preparation.</p>
+                            <div class="quiz-meta">
+                                <span class="difficulty beginner">Beginner</span>
+                                <span class="questions">15 Questions</span>
+                                <span class="rating">★★★★☆ (4.2)</span>
+                            </div>
+                            <a href="#quiz" class="btn btn-card" data-section="quiz">Take Quiz</a>
+                        </div>
+                    </article>
+
+                    <article class="quiz-card">
+                        <div class="quiz-image">
+                            <img src="img/cryptography.jpg" alt="Cryptographic algorithms and encryption methods" class="card-img">
+                        </div>
+                        <div class="quiz-content">
+                            <h4>Cryptography & Encryption</h4>
+                            <p>Master symmetric and asymmetric encryption, hashing algorithms, and digital certificates.</p>
+                            <div class="quiz-meta">
+                                <span class="difficulty intermediate">Intermediate</span>
+                                <span class="questions">20 Questions</span>
+                                <span class="rating">★★★★★ (4.8)</span>
+                            </div>
+                            <a href="#quiz" class="btn btn-card" data-section="quiz">Take Quiz</a>
+                        </div>
+                    </article>
+
+                    <article class="quiz-card">
+                        <div class="quiz-image">
+                            <img src="img/incident-response.jpg" alt="Incident response team analyzing security breach" class="card-img">
+                        </div>
+                        <div class="quiz-content">
+                            <h4>Incident Response</h4>
+                            <p>Learn the steps of incident response, from detection to recovery and lessons learned.</p>
+                            <div class="quiz-meta">
+                                <span class="difficulty advanced">Advanced</span>
+                                <span class="questions">25 Questions</span>
+                                <span class="rating">★★★★☆ (4.5)</span>
+                            </div>
+                            <a href="#quiz" class="btn btn-card" data-section="quiz">Take Quiz</a>
+                        </div>
+                    </article>
+                </div>
+            </div>
+
+            <!-- Statistics Section -->
+            <div class="stats-section">
+                <h3>Join Our Growing Community</h3>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-number">15,000+</div>
+                        <div class="stat-label">Active Learners</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">500+</div>
+                        <div class="stat-label">Expert-Created Quizzes</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">95%</div>
+                        <div class="stat-label">Pass Rate</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">24/7</div>
+                        <div class="stat-label">Community Support</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Study Groups Section -->
+            <div class="study-groups-section">
+                <h3>Join Study Groups</h3>
+                <div class="groups-grid">
+                    <div class="group-card">
+                        <h4>Security+ Study Group</h4>
+                        <p>Weekly study sessions for CompTIA Security+ exam preparation</p>
+                        <div class="group-meta">
+                            <span class="members">245 members</span>
+                            <span class="next-session">Next: Tomorrow 7 PM</span>
+                        </div>
+                        <a href="#" class="btn btn-outline">Join Group</a>
+                    </div>
+                    <div class="group-card">
+                        <h4>CISSP Discussion</h4>
+                        <p>Advanced cybersecurity professionals sharing insights</p>
+                        <div class="group-meta">
+                            <span class="members">89 members</span>
+                            <span class="next-session">Next: Friday 6 PM</span>
+                        </div>
+                        <a href="#" class="btn btn-outline">Join Group</a>
+                    </div>
+                    <div class="group-card">
+                        <h4>Career Changers</h4>
+                        <p>Support group for professionals transitioning to cybersecurity</p>
+                        <div class="group-meta">
+                            <span class="members">156 members</span>
+                            <span class="next-session">Next: Sunday 2 PM</span>
+                        </div>
+                        <a href="#" class="btn btn-outline">Join Group</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- QUIZ SECTION -->
+        <section id="quiz" class="page-section">
+            <!-- Quiz Header -->
+            <div class="quiz-header">
+                <div class="quiz-info">
+                    <h2>Network Security Fundamentals</h2>
+                    <p>Test your knowledge of firewalls, VPNs, and network protocols. Perfect for Security+ preparation.</p>
+                    <div class="quiz-stats">
+                        <span class="stat">15 Questions</span>
+                        <span class="stat">30 Minutes</span>
+                        <span class="stat">Beginner Level</span>
+                    </div>
+                </div>
+                <div class="quiz-progress">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 20%"></div>
+                    </div>
+                    <span class="progress-text">Question 3 of 15</span>
+                </div>
+            </div>
+
+            <!-- Quiz Question -->
+            <div class="quiz-question">
+                <div class="question-card">
+                    <div class="question-header">
+                        <h3>Question 3</h3>
+                        <div class="question-timer">
+                            <span class="timer-icon">⏱️</span>
+                            <span class="timer-text">2:45 remaining</span>
+                        </div>
+                    </div>
+                    
+                    <div class="question-content">
+                        <p>Which of the following is the primary purpose of a firewall in network security?</p>
+                    </div>
+
+                    <form class="quiz-form">
+                        <div class="answer-options">
+                            <label class="option-label">
+                                <input type="radio" name="answer" value="a" class="option-input">
+                                <span class="option-text">To encrypt data transmission between networks</span>
+                            </label>
+                            
+                            <label class="option-label">
+                                <input type="radio" name="answer" value="b" class="option-input">
+                                <span class="option-text">To monitor and control incoming and outgoing network traffic</span>
+                            </label>
+                            
+                            <label class="option-label">
+                                <input type="radio" name="answer" value="c" class="option-input">
+                                <span class="option-text">To authenticate users before granting network access</span>
+                            </label>
+                            
+                            <label class="option-label">
+                                <input type="radio" name="answer" value="d" class="option-input">
+                                <span class="option-text">To provide backup storage for network data</span>
+                            </label>
+                        </div>
+
+                        <div class="question-actions">
+                            <button type="button" class="btn btn-outline" id="skip-btn">Skip Question</button>
+                            <button type="submit" class="btn btn-primary" id="submit-btn">Submit Answer</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Quiz Navigation -->
+            <div class="quiz-navigation">
+                <div class="nav-buttons">
+                    <button class="btn btn-outline" id="prev-btn" disabled>Previous</button>
+                    <button class="btn btn-outline" id="next-btn">Next Question</button>
+                </div>
+                <div class="question-list">
+                    <h4>Question Overview</h4>
+                    <div class="question-numbers">
+                        <span class="q-number completed">1</span>
+                        <span class="q-number completed">2</span>
+                        <span class="q-number current">3</span>
+                        <span class="q-number">4</span>
+                        <span class="q-number">5</span>
+                        <span class="q-number">6</span>
+                        <span class="q-number">7</span>
+                        <span class="q-number">8</span>
+                        <span class="q-number">9</span>
+                        <span class="q-number">10</span>
+                        <span class="q-number">11</span>
+                        <span class="q-number">12</span>
+                        <span class="q-number">13</span>
+                        <span class="q-number">14</span>
+                        <span class="q-number">15</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quiz Results Preview (Hidden by default) -->
+            <div class="quiz-results" style="display: none;">
+                <div class="results-card">
+                    <h3>Quiz Completed!</h3>
+                    <div class="score-display">
+                        <div class="score-circle">
+                            <span class="score-number">85%</span>
+                            <span class="score-label">Score</span>
+                        </div>
+                    </div>
+                    <div class="results-summary">
+                        <div class="summary-item">
+                            <span class="summary-label">Correct Answers:</span>
+                            <span class="summary-value">13/15</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Time Taken:</span>
+                            <span class="summary-value">24:30</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Points Earned:</span>
+                            <span class="summary-value">1,300</span>
+                        </div>
+                    </div>
+                    <div class="results-actions">
+                        <a href="#quiz" class="btn btn-primary" data-section="quiz">Take Another Quiz</a>
+                        <a href="#leaderboard" class="btn btn-secondary" data-section="leaderboard">View Leaderboard</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Related Quizzes -->
+            <div class="related-quizzes">
+                <h3>Continue Learning</h3>
+                <div class="quiz-grid">
+                    <article class="quiz-card">
+                        <div class="quiz-image">
+                            <img src="img/cryptography.jpg" alt="Cryptographic algorithms and encryption methods" class="card-img">
+                        </div>
+                        <div class="quiz-content">
+                            <h4>Cryptography & Encryption</h4>
+                            <p>Master symmetric and asymmetric encryption, hashing algorithms, and digital certificates.</p>
+                            <div class="quiz-meta">
+                                <span class="difficulty intermediate">Intermediate</span>
+                                <span class="questions">20 Questions</span>
+                                <span class="rating">★★★★★ (4.8)</span>
+                            </div>
+                            <a href="#quiz" class="btn btn-card" data-section="quiz">Take Quiz</a>
+                        </div>
+                    </article>
+
+                    <article class="quiz-card">
+                        <div class="quiz-image">
+                            <img src="img/incident-response.jpg" alt="Incident response team analyzing security breach" class="card-img">
+                        </div>
+                        <div class="quiz-content">
+                            <h4>Incident Response</h4>
+                            <p>Learn the steps of incident response, from detection to recovery and lessons learned.</p>
+                            <div class="quiz-meta">
+                                <span class="difficulty advanced">Advanced</span>
+                                <span class="questions">25 Questions</span>
+                                <span class="rating">★★★★☆ (4.5)</span>
+                            </div>
+                            <a href="#quiz" class="btn btn-card" data-section="quiz">Take Quiz</a>
+                        </div>
+                    </article>
+
+                    <article class="quiz-card">
+                        <div class="quiz-image">
+                            <img src="img/risk-management.jpg" alt="Risk assessment matrix and security controls" class="card-img">
+                        </div>
+                        <div class="quiz-content">
+                            <h4>Risk Management</h4>
+                            <p>Understand risk assessment, mitigation strategies, and security control frameworks.</p>
+                            <div class="quiz-meta">
+                                <span class="difficulty intermediate">Intermediate</span>
+                                <span class="questions">18 Questions</span>
+                                <span class="rating">★★★★☆ (4.3)</span>
+                            </div>
+                            <a href="#quiz" class="btn btn-card" data-section="quiz">Take Quiz</a>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- LEADERBOARD SECTION -->
+        <section id="leaderboard" class="page-section">
+            <!-- Leaderboard Header -->
+            <div class="leaderboard-header">
+                <h2>🏆 Global Leaderboard</h2>
+                <p>Compete with cybersecurity learners worldwide and climb the rankings!</p>
+                <div class="leaderboard-filters">
+                    <form class="filter-form">
+                        <div class="form-group">
+                            <label for="timeframe">Timeframe</label>
+                            <select id="timeframe" name="timeframe">
+                                <option value="all-time">All Time</option>
+                                <option value="monthly">This Month</option>
+                                <option value="weekly">This Week</option>
+                                <option value="daily">Today</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="category">Category</label>
+                            <select id="category" name="category">
+                                <option value="overall">Overall</option>
+                                <option value="network-security">Network Security</option>
+                                <option value="cryptography">Cryptography</option>
+                                <option value="incident-response">Incident Response</option>
+                                <option value="risk-management">Risk Management</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="certification">Certification</label>
+                            <select id="certification" name="certification">
+                                <option value="all">All Certifications</option>
+                                <option value="security-plus">Security+</option>
+                                <option value="cissp">CISSP</option>
+                                <option value="ceh">CEH</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-search">Filter</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Top Performers -->
+            <div class="top-performers">
+                <h3>Top Performers</h3>
+                <div class="podium">
+                    <div class="podium-place second">
+                        <div class="medal">🥈</div>
+                        <div class="player-info">
+                            <h4>Sarah Chen</h4>
+                            <p>Security Analyst</p>
+                            <div class="score">24,850 pts</div>
+                        </div>
+                    </div>
+                    <div class="podium-place first">
+                        <div class="medal">🥇</div>
+                        <div class="player-info">
+                            <h4>Alex Rodriguez</h4>
+                            <p>Cybersecurity Engineer</p>
+                            <div class="score">28,420 pts</div>
+                        </div>
+                    </div>
+                    <div class="podium-place third">
+                        <div class="medal">🥉</div>
+                        <div class="player-info">
+                            <h4>Maria Garcia</h4>
+                            <p>Penetration Tester</p>
+                            <div class="score">22,190 pts</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Leaderboard Table -->
+            <div class="leaderboard-table">
+                <h3>Full Rankings</h3>
+                <div class="table-container">
+                    <table class="leaderboard-table-content">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Player</th>
+                                <th>Points</th>
+                                <th>Quizzes</th>
+                                <th>Accuracy</th>
+                                <th>Streak</th>
+                                <th>Badges</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="current-user">
+                                <td>4</td>
+                                <td>
+                                    <div class="player-cell">
+                                        <img src="img/user-avatar.jpg" alt="Your avatar" class="player-avatar">
+                                        <div class="player-details">
+                                            <span class="player-name">You</span>
+                                            <span class="player-title">Student</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>21,450</td>
+                                <td>47</td>
+                                <td>89%</td>
+                                <td>12 days</td>
+                                <td>
+                                    <div class="badges">
+                                        <span class="badge gold">🏆</span>
+                                        <span class="badge silver">🥈</span>
+                                        <span class="badge bronze">🥉</span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>5</td>
+                                <td>
+                                    <div class="player-cell">
+                                        <img src="img/avatar-placeholder.png" alt="Player avatar" class="player-avatar">
+                                        <div class="player-details">
+                                            <span class="player-name">David Kim</span>
+                                            <span class="player-title">IT Manager</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>19,820</td>
+                                <td>42</td>
+                                <td>87%</td>
+                                <td>8 days</td>
+                                <td>
+                                    <div class="badges">
+                                        <span class="badge gold">🏆</span>
+                                        <span class="badge silver">🥈</span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>6</td>
+                                <td>
+                                    <div class="player-cell">
+                                        <img src="img/avatar-placeholder.png" alt="Player avatar" class="player-avatar">
+                                        <div class="player-details">
+                                            <span class="player-name">Jennifer Liu</span>
+                                            <span class="player-title">Security Consultant</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>18,650</td>
+                                <td>39</td>
+                                <td>92%</td>
+                                <td>15 days</td>
+                                <td>
+                                    <div class="badges">
+                                        <span class="badge gold">🏆</span>
+                                        <span class="badge gold">🏆</span>
+                                        <span class="badge silver">🥈</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Achievement Badges -->
+            <div class="achievements">
+                <h3>Achievement Badges</h3>
+                <div class="badges-grid">
+                    <div class="badge-card">
+                        <div class="badge-icon">🏆</div>
+                        <h4>Quiz Master</h4>
+                        <p>Complete 50 quizzes with 90%+ accuracy</p>
+                        <div class="badge-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 94%"></div>
+                            </div>
+                            <span>47/50 quizzes</span>
+                        </div>
+                    </div>
+                    <div class="badge-card">
+                        <div class="badge-icon">🔥</div>
+                        <h4>Streak Master</h4>
+                        <p>Maintain a 30-day study streak</p>
+                        <div class="badge-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 40%"></div>
+                            </div>
+                            <span>12/30 days</span>
+                        </div>
+                    </div>
+                    <div class="badge-card">
+                        <div class="badge-icon">🎯</div>
+                        <h4>Accuracy Expert</h4>
+                        <p>Achieve 95% accuracy across all quizzes</p>
+                        <div class="badge-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 89%"></div>
+                            </div>
+                            <span>89% accuracy</span>
+                        </div>
+                    </div>
+                    <div class="badge-card">
+                        <div class="badge-icon">⚡</div>
+                        <h4>Speed Demon</h4>
+                        <p>Complete 10 quizzes in under 5 minutes each</p>
+                        <div class="badge-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 70%"></div>
+                            </div>
+                            <span>7/10 quizzes</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RESOURCES SECTION -->
+        <section id="resources" class="page-section">
+            <!-- Resources Header -->
+            <div class="resources-header">
+                <h2>📚 Cybersecurity Learning Resources</h2>
+                <p>Expert-curated materials to accelerate your cybersecurity journey</p>
+                <div class="resource-search">
+                    <form class="resource-search-form">
+                        <div class="form-group">
+                            <label for="resource-search">Search Resources</label>
+                            <input type="text" id="resource-search" name="search" placeholder="e.g., Network Security, Cryptography" aria-label="Search for cybersecurity resources">
+                        </div>
+                        <div class="form-group">
+                            <label for="resource-type">Resource Type</label>
+                            <select id="resource-type" name="type">
+                                <option value="">All Types</option>
+                                <option value="video">Videos</option>
+                                <option value="article">Articles</option>
+                                <option value="book">Books</option>
+                                <option value="course">Courses</option>
+                                <option value="tool">Tools</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="difficulty-level">Difficulty</label>
+                            <select id="difficulty-level" name="difficulty">
+                                <option value="">All Levels</option>
+                                <option value="beginner">Beginner</option>
+                                <option value="intermediate">Intermediate</option>
+                                <option value="advanced">Advanced</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-search">Search</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Featured Resources -->
+            <div class="featured-resources">
+                <h3>🌟 Featured Resources</h3>
+                <div class="resource-grid">
+                    <article class="resource-card featured">
+                        <div class="resource-image">
+                            <img src="img/professor-messer.jpg" alt="Professor Messer Security+ Course" class="card-img">
+                            <div class="resource-badge">Most Popular</div>
+                        </div>
+                        <div class="resource-content">
+                            <div class="resource-type">Video Course</div>
+                            <h4>Professor Messer Security+ Course</h4>
+                            <p>Comprehensive free video series covering all CompTIA Security+ SY0-601 objectives. Over 100 hours of expert instruction.</p>
+                            <div class="resource-meta">
+                                <span class="duration">100+ hours</span>
+                                <span class="rating">★★★★★ (4.9)</span>
+                                <span class="level beginner">Beginner</span>
+                            </div>
+                            <div class="resource-actions">
+                                <a href="https://www.professormesser.com/security-plus/sy0-601/sy0-601-training-course/" target="_blank" class="btn btn-primary">Watch Now</a>
+                                <button class="btn btn-outline">Save</button>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="resource-card">
+                        <div class="resource-image">
+                            <img src="img/security-plus-book.jpg" alt="CompTIA Security+ Study Guide" class="card-img">
+                        </div>
+                        <div class="resource-content">
+                            <div class="resource-type">Book</div>
+                            <h4>CompTIA Security+ Study Guide</h4>
+                            <p>Official study guide covering all exam objectives with practice questions and hands-on labs.</p>
+                            <div class="resource-meta">
+                                <span class="pages">800+ pages</span>
+                                <span class="rating">★★★★☆ (4.6)</span>
+                                <span class="level intermediate">Intermediate</span>
+                            </div>
+                            <div class="resource-actions">
+                                <a href="https://www.amazon.com/CompTIA-Security-Certification-SY0-601/dp/1264268749" target="_blank" class="btn btn-primary">Get Book</a>
+                                <button class="btn btn-outline">Save</button>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="resource-card">
+                        <div class="resource-image">
+                            <img src="img/cybrary-course.jpg" alt="Cybrary Cybersecurity Courses" class="card-img">
+                        </div>
+                        <div class="resource-content">
+                            <div class="resource-type">Course</div>
+                            <h4>Cybrary Cybersecurity Courses</h4>
+                            <p>Free cybersecurity courses covering ethical hacking, incident response, and security fundamentals.</p>
+                            <div class="resource-meta">
+                                <span class="courses">50+ courses</span>
+                                <span class="rating">★★★★☆ (4.4)</span>
+                                <span class="level beginner">Beginner</span>
+                            </div>
+                            <div class="resource-actions">
+                                <a href="https://www.cybrary.it/" target="_blank" class="btn btn-primary">Explore</a>
+                                <button class="btn btn-outline">Save</button>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </div>
+
+            <!-- Resource Categories -->
+            <div class="resource-categories">
+                <h3>Browse by Category</h3>
+                <div class="categories-grid">
+                    <div class="category-card">
+                        <div class="category-icon">🎥</div>
+                        <h4>Video Courses</h4>
+                        <p>Expert-led video tutorials and courses</p>
+                        <div class="category-count">25 resources</div>
+                        <a href="#" class="btn btn-outline">Browse Videos</a>
+                    </div>
+                    <div class="category-card">
+                        <div class="category-icon">📖</div>
+                        <h4>Books & eBooks</h4>
+                        <p>Comprehensive study guides and textbooks</p>
+                        <div class="category-count">18 resources</div>
+                        <a href="#" class="btn btn-outline">Browse Books</a>
+                    </div>
+                    <div class="category-card">
+                        <div class="category-icon">🔧</div>
+                        <h4>Tools & Software</h4>
+                        <p>Security tools and practice environments</p>
+                        <div class="category-count">12 resources</div>
+                        <a href="#" class="btn btn-outline">Browse Tools</a>
+                    </div>
+                    <div class="category-card">
+                        <div class="category-icon">📰</div>
+                        <h4>Articles & Blogs</h4>
+                        <p>Latest insights and industry news</p>
+                        <div class="category-count">35 resources</div>
+                        <a href="#" class="btn btn-outline">Browse Articles</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Certification Paths -->
+            <div class="certification-paths">
+                <h3>Certification Learning Paths</h3>
+                <div class="cert-grid">
+                    <div class="cert-card">
+                        <div class="cert-header">
+                            <img src="img/comptia-logo.png" alt="CompTIA Logo" class="cert-logo">
+                            <h4>CompTIA Security+</h4>
+                        </div>
+                        <p>Entry-level cybersecurity certification covering network security, compliance, and risk management.</p>
+                        <div class="cert-resources">
+                            <div class="resource-item">
+                                <span class="resource-icon">🎥</span>
+                                <span>Professor Messer Course</span>
+                            </div>
+                            <div class="resource-item">
+                                <span class="resource-icon">📖</span>
+                                <span>Official Study Guide</span>
+                            </div>
+                            <div class="resource-item">
+                                <span class="resource-icon">🔧</span>
+                                <span>Practice Tests</span>
+                            </div>
+                        </div>
+                        <a href="#" class="btn btn-primary">Start Learning</a>
+                    </div>
+
+                    <div class="cert-card">
+                        <div class="cert-header">
+                            <img src="img/cissp-logo.png" alt="CISSP Logo" class="cert-logo">
+                            <h4>CISSP</h4>
+                        </div>
+                        <p>Advanced certification for experienced security professionals covering 8 security domains.</p>
+                        <div class="cert-resources">
+                            <div class="resource-item">
+                                <span class="resource-icon">🎥</span>
+                                <span>CISSP Training Videos</span>
+                            </div>
+                            <div class="resource-item">
+                                <span class="resource-icon">📖</span>
+                                <span>CISSP Study Guide</span>
+                            </div>
+                            <div class="resource-item">
+                                <span class="resource-icon">🔧</span>
+                                <span>Domain Practice Tests</span>
+                            </div>
+                        </div>
+                        <a href="#" class="btn btn-primary">Start Learning</a>
+                    </div>
+
+                    <div class="cert-card">
+                        <div class="cert-header">
+                            <img src="img/ceh-logo.png" alt="CEH Logo" class="cert-logo">
+                            <h4>CEH</h4>
+                        </div>
+                        <p>Ethical Hacking certification focusing on penetration testing and vulnerability assessment.</p>
+                        <div class="cert-resources">
+                            <div class="resource-item">
+                                <span class="resource-icon">🎥</span>
+                                <span>Ethical Hacking Course</span>
+                            </div>
+                            <div class="resource-item">
+                                <span class="resource-icon">📖</span>
+                                <span>CEH Study Guide</span>
+                            </div>
+                            <div class="resource-item">
+                                <span class="resource-icon">🔧</span>
+                                <span>Lab Environment</span>
+                            </div>
+                        </div>
+                        <a href="#" class="btn btn-primary">Start Learning</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PROFILE SECTION -->
+        <section id="profile" class="page-section">
+            <!-- Profile Header -->
+            <div class="profile-header">
+                <div class="profile-info">
+                    <div class="profile-avatar">
+                        <img src="img/user-avatar.jpg" alt="Your profile picture" class="avatar-img">
+                        <button class="avatar-edit">✏️</button>
+                    </div>
+                    <div class="profile-details">
+                        <h2>Alex Johnson</h2>
+                        <p class="profile-title">Cybersecurity Student</p>
+                        <p class="profile-location">📍 Seattle, WA</p>
+                        <div class="profile-stats">
+                            <div class="stat-item">
+                                <span class="stat-number">47</span>
+                                <span class="stat-label">Quizzes Completed</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number">21,450</span>
+                                <span class="stat-label">Total Points</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number">89%</span>
+                                <span class="stat-label">Average Accuracy</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number">12</span>
+                                <span class="stat-label">Day Streak</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="profile-actions">
+                    <button class="btn btn-outline">Edit Profile</button>
+                    <button class="btn btn-primary">Share Progress</button>
+                </div>
+            </div>
+
+            <!-- Progress Overview -->
+            <div class="progress-overview">
+                <h3>Learning Progress</h3>
+                <div class="progress-grid">
+                    <div class="progress-card">
+                        <h4>Security+ Preparation</h4>
+                        <div class="progress-circle">
+                            <div class="circle-progress" data-progress="75">
+                                <span class="progress-text">75%</span>
+                            </div>
+                        </div>
+                        <p>Complete 3 more modules to finish</p>
+                        <a href="#resources" class="btn btn-outline" data-section="resources">Continue Learning</a>
+                    </div>
+                    <div class="progress-card">
+                        <h4>Network Security</h4>
+                        <div class="progress-circle">
+                            <div class="circle-progress" data-progress="60">
+                                <span class="progress-text">60%</span>
+                            </div>
+                        </div>
+                        <p>Master firewall concepts</p>
+                        <a href="#quiz" class="btn btn-outline" data-section="quiz">Take Quiz</a>
+                    </div>
+                    <div class="progress-card">
+                        <h4>Cryptography</h4>
+                        <div class="progress-circle">
+                            <div class="circle-progress" data-progress="45">
+                                <span class="progress-text">45%</span>
+                            </div>
+                        </div>
+                        <p>Learn encryption algorithms</p>
+                        <a href="#resources" class="btn btn-outline" data-section="resources">Study Materials</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="recent-activity">
+                <h3>Recent Activity</h3>
+                <div class="activity-timeline">
+                    <div class="activity-item">
+                        <div class="activity-icon">✅</div>
+                        <div class="activity-content">
+                            <h4>Completed Network Security Quiz</h4>
+                            <p>Scored 85% on Network Security Fundamentals</p>
+                            <span class="activity-time">2 hours ago</span>
+                        </div>
+                        <div class="activity-points">+150 pts</div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon">📚</div>
+                        <div class="activity-content">
+                            <h4>Watched Professor Messer Video</h4>
+                            <p>Completed "Firewall Configuration" lesson</p>
+                            <span class="activity-time">5 hours ago</span>
+                        </div>
+                        <div class="activity-points">+50 pts</div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon">🏆</div>
+                        <div class="activity-content">
+                            <h4>Earned Accuracy Expert Badge</h4>
+                            <p>Achieved 90%+ accuracy for 10 consecutive quizzes</p>
+                            <span class="activity-time">1 day ago</span>
+                        </div>
+                        <div class="activity-points">+500 pts</div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon">👥</div>
+                        <div class="activity-content">
+                            <h4>Joined Security+ Study Group</h4>
+                            <p>Participated in weekly study session</p>
+                            <span class="activity-time">2 days ago</span>
+                        </div>
+                        <div class="activity-points">+100 pts</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Achievements -->
+            <div class="achievements-profile">
+                <h3>Your Achievements</h3>
+                <div class="achievements-grid">
+                    <div class="achievement-card earned">
+                        <div class="achievement-icon">🏆</div>
+                        <h4>Quiz Master</h4>
+                        <p>Complete 50 quizzes with 90%+ accuracy</p>
+                        <div class="achievement-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 94%"></div>
+                            </div>
+                            <span>47/50 quizzes</span>
+                        </div>
+                    </div>
+                    <div class="achievement-card earned">
+                        <div class="achievement-icon">🔥</div>
+                        <h4>Streak Master</h4>
+                        <p>Maintain a 30-day study streak</p>
+                        <div class="achievement-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 40%"></div>
+                            </div>
+                            <span>12/30 days</span>
+                        </div>
+                    </div>
+                    <div class="achievement-card earned">
+                        <div class="achievement-icon">🎯</div>
+                        <h4>Accuracy Expert</h4>
+                        <p>Achieve 95% accuracy across all quizzes</p>
+                        <div class="achievement-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 89%"></div>
+                            </div>
+                            <span>89% accuracy</span>
+                        </div>
+                    </div>
+                    <div class="achievement-card locked">
+                        <div class="achievement-icon">⚡</div>
+                        <h4>Speed Demon</h4>
+                        <p>Complete 10 quizzes in under 5 minutes each</p>
+                        <div class="achievement-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 70%"></div>
+                            </div>
+                            <span>7/10 quizzes</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Study Goals -->
+            <div class="study-goals">
+                <h3>Study Goals</h3>
+                <div class="goals-container">
+                    <div class="goal-card">
+                        <h4>Complete Security+ Certification</h4>
+                        <p>Target: March 2024</p>
+                        <div class="goal-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 75%"></div>
+                            </div>
+                            <span>75% Complete</span>
+                        </div>
+                        <div class="goal-actions">
+                            <a href="#resources" class="btn btn-primary" data-section="resources">Study Now</a>
+                            <button class="btn btn-outline">Edit Goal</button>
+                        </div>
+                    </div>
+                    <div class="goal-card">
+                        <h4>Master Network Security</h4>
+                        <p>Target: February 2024</p>
+                        <div class="goal-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 60%"></div>
+                            </div>
+                            <span>60% Complete</span>
+                        </div>
+                        <div class="goal-actions">
+                            <a href="#quiz" class="btn btn-primary" data-section="quiz">Take Quiz</a>
+                            <button class="btn btn-outline">Edit Goal</button>
+                        </div>
+                    </div>
+                    <div class="goal-card">
+                        <h4>Join CISSP Study Group</h4>
+                        <p>Target: January 2024</p>
+                        <div class="goal-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 100%"></div>
+                            </div>
+                            <span>Completed ✅</span>
+                        </div>
+                        <div class="goal-actions">
+                            <button class="btn btn-outline">Set New Goal</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>CyberLearn</h4>
+                <p>Democratizing cybersecurity education through community-driven learning.</p>
+            </div>
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="#quiz" data-section="quiz">Quizzes</a></li>
+                    <li><a href="#leaderboard" data-section="leaderboard">Leaderboard</a></li>
+                    <li><a href="#resources" data-section="resources">Resources</a></li>
+                    <li><a href="#profile" data-section="profile">Profile</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Support</h4>
+                <ul>
+                    <li><a href="mailto:support@cyberlearn.edu">Contact Us</a></li>
+                    <li><a href="https://github.com/cyberlearn" target="_blank">GitHub</a></li>
+                    <li><a href="https://twitter.com/cyberlearn" target="_blank">Twitter</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 CyberLearn. All rights reserved. | Created by Chuantong Yang & Visar Krasniqi</p>
+        </div>
+    </footer>
+
+    <!-- Simple JavaScript for section navigation -->
+    <script>
+        // Simple section navigation
+        document.addEventListener('DOMContentLoaded', function() {
+            const navLinks = document.querySelectorAll('.nav-link[data-section]');
+            const sections = document.querySelectorAll('.page-section');
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetSection = this.getAttribute('data-section');
+                    
+                    // Hide all sections
+                    sections.forEach(section => {
+                        section.classList.remove('active');
+                    });
+                    
+                    // Show target section
+                    const targetElement = document.getElementById(targetSection);
+                    if (targetElement) {
+                        targetElement.classList.add('active');
+                    }
+                    
+                    // Update active nav link
+                    navLinks.forEach(navLink => {
+                        navLink.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
