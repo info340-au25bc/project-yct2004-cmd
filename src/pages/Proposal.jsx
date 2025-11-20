@@ -1,0 +1,85 @@
+import React from 'react'
+
+export default function Proposal(){
+  return (
+    <main>
+      <section>
+        <h2>Problem/Data Domain</h2>
+        <p>
+          Cybersecurity awareness represents a critical challenge in our increasingly digital world, where individuals and organizations face constant threats from phishing attacks, malware, social engineering, and data breaches. Despite the growing sophistication of cyber threats, many people lack fundamental knowledge about online safety practices, password security, and recognizing common attack vectors. According to the <a href="https://www.verizon.com/business/resources/reports/dbir/" target="_blank" rel="noreferrer">2023 Verizon Data Breach Investigations Report</a>, 74% of breaches involve human error, highlighting a significant gap in cybersecurity literacy across all demographics. This knowledge deficit affects everyone from students and remote workers to small business owners, making cybersecurity education not just a technical issue but a social imperative.
+        </p>
+        <p>
+          The information technology problem in this space is the lack of accessible, engaging, and personalized tools for both delivering and assessing cybersecurity knowledge. While corporate training programs exist, they're often expensive and inaccessible to individual learners. Educational resources are frequently static and don't provide interactive ways to test comprehension or track improvement over time. Existing solutions like KnowBe4 and SANS Security Awareness focus primarily on enterprise clients with subscription models, while free resources like <a href="https://phishingquiz.withgoogle.com/" target="_blank" rel="noreferrer">Google's Phishing Quiz</a> or the National Cyber Security Centre's online materials offer limited interactivity and no community-driven content creation. There's a gap for a platform that democratizes both the creation and consumption of cybersecurity knowledge—allowing security professionals, educators, or experienced users to share their expertise through custom quizzes while enabling learners to assess their vulnerabilities and track their progress through competitive scoring and ranking systems.
+        </p>
+      </section>
+
+      <section>
+        <h2>App Description</h2>
+        <h3>By: Chuantong Yang, Visar Krasniqi</h3>
+        <p>
+          This application will help people who are unable to access informational spaces regarding cybersecurity terminology and concepts. More specifically, it aims to help students study for certifications such as the CompTIA Security+ while also forming groups that can lead to lasting connections within the cybersecurity community, providing opportunities for mentorship and career growth.
+        </p>
+        <p>In this app, people will be able to:</p>
+        <ul>
+          <li>Get directed to free relevant cybersecurity resources</li>
+          <li>Create and join study groups</li>
+          <li>Collaborate by making questions related to the sources they reviewed</li>
+          <li>Get ranked and compete with others through a point system</li>
+          <li>Give feedback in the event of a mistake by the question creator</li>
+        </ul>
+        <p>
+          The resources recommended by the app will include videos, articles, and textbooks curated by experts in the field. Examples include the 
+          <a href="https://www.professormesser.com/security-plus/sy0-601/sy0-601-training-course/" target="_blank" rel="noreferrer">Professor Messer Security+ Course</a>,
+          a highly rated collection of free videos that cover all the topics needed to pass the Security+ exam, and the 
+          <a href="https://www.amazon.com/CompTIA-Security-Certification-SY0-601/dp/1264268749" target="_blank" rel="noreferrer">CompTIA Security+ Study Guide</a>,
+          a comprehensive textbook covering the same material.
+        </p>
+        <p>The app aims to:</p>
+        <ul>
+          <li>Help people new to cybersecurity access free resources to learn the basics</li>
+          <li>Create a community of learners who support each other's growth</li>
+          <li>Make learning about cybersecurity fun and engaging through competition</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>Interactive Features</h2>
+        <p>
+          To make learning engaging and collaborative, the platform will include several interactive components designed to motivate users and personalize their educational journey:
+        </p>
+        <ul>
+          <li><strong>Registration system:</strong> participants can use their email or phone number to register their account</li>
+          <li><strong>Interactive Quizzes:</strong> Users can take quizzes generated from community-created questions and receive instant feedback with explanations for correct and incorrect answers.</li>
+          <li><strong>Leaderboard System:</strong> A ranking feature encourages healthy competition and allows users to track progress over time.</li>
+          <li><strong>Discussion Forums:</strong> Each quiz or resource includes a comment section where users can discuss solutions, clarify doubts, and share study strategies.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>User Audience</h2>
+        <p>
+          The platform is designed for a diverse audience that includes:
+        </p>
+        <ul>
+          <li><strong>Students:</strong> Especially those studying information technology, computer science, or cybersecurity who need accessible study tools for certifications.</li>
+          <li><strong>Career Changers:</strong> Individuals transitioning into cybersecurity who require beginner-friendly and cost-effective learning pathways.</li>
+          <li><strong>Educators and Trainers:</strong> Teachers or cybersecurity professionals who want to create and share interactive quizzes to support their courses.</li>
+          <li><strong>Small Business Owners:</strong> People looking to strengthen their organization's cybersecurity culture without investing in expensive enterprise programs.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>Impact</h2>
+        <p>
+          The Cybersecurity Education Platform has the potential to transform how cybersecurity knowledge is shared and practiced. By removing financial and institutional barriers, it empowers individuals worldwide to learn, teach, and collaborate on equal footing.
+        </p>
+        <p>
+          In the short term, the platform will increase cybersecurity literacy and confidence among students and self-learners. Over time, it can contribute to reducing the number of human-error-based breaches by making safe digital behavior part of everyday practice. The community-driven approach ensures continuous improvement, as learners and experts collectively expand and refine the educational content.
+        </p>
+        <p>
+          Ultimately, this project aims to make cybersecurity awareness not an elite skill, but a universal competency accessible to all.
+        </p>
+      </section>
+    </main>
+  )
+}
