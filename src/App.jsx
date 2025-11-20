@@ -9,8 +9,7 @@ import GroupCreation from './pages/GroupCreation'
 import Resources from './pages/Resources'
 import Ranking from './pages/Ranking'
 import TestQuestions from './pages/TestQuestions'
-import '../project-draft/style.css'
-import '../project-draft/css/proposal.css'
+import './App.css'
 
 export default function App(){
   return (
