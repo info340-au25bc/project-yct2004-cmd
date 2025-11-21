@@ -15,7 +15,7 @@ export default function Proposal(){
 
       <section>
         <h2>App Description</h2>
-        <h3>By: Chuantong Yang, Visar Krasniqi</h3>
+        <h3>By: Chuantong Yang, Visar Mecaj</h3>
         <p>
           This application will help people who are unable to access informational spaces regarding cybersecurity terminology and concepts. More specifically, it aims to help students study for certifications such as the CompTIA Security+ while also forming groups that can lead to lasting connections within the cybersecurity community, providing opportunities for mentorship and career growth.
         </p>

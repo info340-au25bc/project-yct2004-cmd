@@ -1,5 +1,11 @@
 import React, { useState } from 'react'
 
+const renderStars = (rating) => {
+  const fullStars = Math.floor(rating)
+  const halfStar = rating % 1 >= 0.5
+  return '★'.repeat(fullStars) + (halfStar ? '½' : '') + '☆'.repeat(5 - fullStars - (halfStar ? 1 : 0))
+}
+
 const resources = [
   {
     id: 1,
@@ -165,6 +171,8 @@ export default function Resources(){
         </div>
       </section>
 
+   
+
       <section className="featured-resources">
         <h3>🌟 Featured Resources</h3>
         <div className="resource-grid">
@@ -179,7 +187,11 @@ export default function Resources(){
                   {resource.duration && <span className="duration">{resource.duration}</span>}
                   {resource.pages && <span className="pages">{resource.pages}</span>}
                   {resource.courses && <span className="courses">{resource.courses}</span>}
-                  {resource.rating && <span className="rating">★★★★☆ ({resource.rating})</span>}
+                  {resource.rating && (
+                    <span className="rating">
+                      {renderStars(resource.rating)} ({resource.rating})
+                    </span>
+                  )}
                   <span className={`level ${resource.difficulty}`}>{resource.difficulty}</span>
                 </div>
                 <div className="resource-actions">
