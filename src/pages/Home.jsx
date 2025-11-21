@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 
 const initialQuizzes = [
@@ -8,6 +8,7 @@ const initialQuizzes = [
     difficulty: 'beginner', 
     questions: 15, 
     rating: 4.2,
+    certification: 'security-plus',
     description: 'Test your knowledge of firewalls, VPNs, and network protocols. Perfect for Security+ preparation.',
     image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=200&fit=crop'
   },
@@ -17,6 +18,7 @@ const initialQuizzes = [
     difficulty: 'intermediate', 
     questions: 20, 
     rating: 4.8,
+    certification: 'cissp',
     description: 'Master symmetric and asymmetric encryption, hashing algorithms, and digital certificates.',
     image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=200&fit=crop'
   },
@@ -26,6 +28,7 @@ const initialQuizzes = [
     difficulty: 'advanced', 
     questions: 25, 
     rating: 4.5,
+    certification: 'cism',
     description: 'Learn the steps of incident response, from detection to recovery and lessons learned.',
     image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=200&fit=crop'
   }
@@ -63,11 +66,22 @@ export default function Home(){
   const [level, setLevel] = useState('')
   const [certification, setCertification] = useState('')
 
-  const filtered = initialQuizzes.filter(q => {
-    const matchesQuery = q.title.toLowerCase().includes(query.toLowerCase())
-    const matchesLevel = level ? q.difficulty === level : true
-    return matchesQuery && matchesLevel
-  })
+  // ✅ useMemo for performance
+  const filtered = useMemo(() => {
+    return initialQuizzes.filter(q => {
+      const matchesQuery = q.title.toLowerCase().includes(query.toLowerCase())
+      const matchesLevel = level ? q.difficulty === level : true
+      const matchesCert = certification ? q.certification === certification : true
+      return matchesQuery && matchesLevel && matchesCert
+    })
+  }, [query, level, certification])
+
+  // ✅ helper for star rating
+  const renderStars = (rating) => {
+    const fullStars = Math.floor(rating)
+    const halfStar = rating % 1 >= 0.5
+    return '★'.repeat(fullStars) + (halfStar ? '½' : '') + '☆'.repeat(5 - fullStars - (halfStar ? 1 : 0))
+  }
 
   return (
     <main>
@@ -75,7 +89,7 @@ export default function Home(){
       <section className="hero">
         <div className="hero-content">
           <h2>Master Cybersecurity Through Interactive Learning</h2>
-          <p>Join thousands of learners preparing for CompTIA Security+ and other cybersecurity certifications through community-driven quizzes, study groups, and expert-curated resources.</p>
+          <p>Join thousands of learners preparing for CompTIA Security+ and other certifications through community-driven quizzes, study groups, and expert-curated resources.</p>
           <div className="hero-buttons">
             <Link to="/quiz" className="btn btn-primary">Start Learning</Link>
             <Link to="/resources" className="btn btn-secondary">Browse Resources</Link>
@@ -86,7 +100,7 @@ export default function Home(){
       {/* Search and Filter Section */}
       <section className="search-section">
         <h3>Find Your Perfect Study Material</h3>
-        <form className="search-form" role="search" onSubmit={(e) => e.preventDefault()}>
+        <form className="search-form" role="search">
           <div className="form-group">
             <label htmlFor="search-topic">Search Topic</label>
             <input 
@@ -127,18 +141,17 @@ export default function Home(){
               <option value="cism">CISM</option>
             </select>
           </div>
-          <button type="submit" className="btn btn-search">Search</button>
         </form>
       </section>
 
       {/* Featured Quizzes Section */}
-      <section className="featured-section">
+      <section className="featured-section" aria-live="polite">
         <h3>Featured Quizzes</h3>
-        <div className="quiz-grid">
+        <ul className="quiz-grid">
           {filtered.map(q => (
-            <article className="quiz-card" key={q.id}>
+            <li className="quiz-card" key={q.id}>
               <div className="quiz-image">
-                <img src={q.image} alt={`${q.title} quiz preview`} className="card-img" />
+                <img src={q.image} alt={`${q.title} quiz preview`} className="card-img" loading="lazy" />
               </div>
               <div className="quiz-content">
                 <h4>{q.title}</h4>
@@ -146,44 +159,32 @@ export default function Home(){
                 <div className="quiz-meta">
                   <span className={`difficulty ${q.difficulty}`}>{q.difficulty}</span>
                   <span className="questions">{q.questions} Questions</span>
-                  <span className="rating">★★★★☆ ({q.rating})</span>
+                  <span className="rating">{renderStars(q.rating)} ({q.rating})</span>
                 </div>
                 <Link to="/quiz" className="btn btn-card" onClick={() => window.scrollTo(0, 0)}>Take Quiz</Link>
               </div>
-            </article>
+            </li>
           ))}
-        </div>
+        </ul>
       </section>
 
       {/* Statistics Section */}
       <section className="stats-section">
         <h3>Join Our Growing Community</h3>
         <div className="stats-grid">
-          <div className="stat-item">
-            <div className="stat-number">15,000+</div>
-            <div className="stat-label">Active Learners</div>
-          </div>
-          <div className="stat-item">
-            <div className="stat-number">500+</div>
-            <div className="stat-label">Expert-Created Quizzes</div>
-          </div>
-          <div className="stat-item">
-            <div className="stat-number">95%</div>
-            <div className="stat-label">Pass Rate</div>
-          </div>
-          <div className="stat-item">
-            <div className="stat-number">24/7</div>
-            <div className="stat-label">Community Support</div>
-          </div>
+          <div className="stat-item"><div className="stat-number">15,000+</div><div className="stat-label">Active Learners</div></div>
+          <div className="stat-item"><div className="stat-number">500+</div><div className="stat-label">Expert-Created Quizzes</div></div>
+          <div className="stat-item"><div className="stat-number">95%</div><div className="stat-label">Pass Rate</div></div>
+          <div className="stat-item"><div className="stat-number">24/7</div><div className="stat-label">Community Support</div></div>
         </div>
       </section>
 
       {/* Study Groups Section */}
       <section className="study-groups-section">
         <h3>Join Study Groups</h3>
-        <div className="groups-grid">
+        <ul className="groups-grid">
           {studyGroups.map(group => (
-            <div className="group-card" key={group.id}>
+            <li className="group-card" key={group.id}>
               <h4>{group.name}</h4>
               <p>{group.description}</p>
               <div className="group-meta">
@@ -191,9 +192,9 @@ export default function Home(){
                 <span className="next-session">Next: {group.nextSession}</span>
               </div>
               <Link to="/groups" className="btn btn-outline">Join Group</Link>
-            </div>
+            </li>
           ))}
-        </div>
+        </ul>
       </section>
     </main>
   )
