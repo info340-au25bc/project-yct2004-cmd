@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 
 const quizQuestions = [
@@ -57,27 +57,30 @@ export default function QuizPage(){
 
   function handleNext(){
     if (currentQuestion < totalQuestions - 1) {
-      setCurrentQuestion(prev => prev + 1)
-      setSelected(answers[currentQuestion + 2] || '')
+      const nextIndex = currentQuestion + 1
+      setCurrentQuestion(nextIndex)
+      setSelected(answers[quizQuestions[nextIndex].id] || '')
       setSubmitted(false)
     } else {
-      // Quiz completed
       setShowResults(true)
     }
   }
 
   function handlePrevious(){
     if (currentQuestion > 0) {
-      setCurrentQuestion(prev => prev - 1)
-      setSelected(answers[currentQuestion] || '')
+      const prevIndex = currentQuestion - 1
+      setCurrentQuestion(prevIndex)
+      setSelected(answers[quizQuestions[prevIndex].id] || '')
       setSubmitted(false)
     }
   }
 
-  const score = Object.keys(answers).reduce((acc, qId) => {
-    const q = quizQuestions.find(q => q.id === parseInt(qId))
-    return acc + (answers[qId] === q?.correct ? 1 : 0)
-  }, 0)
+  const score = useMemo(() => {
+    return Object.keys(answers).reduce((acc, qId) => {
+      const q = quizQuestions.find(q => q.id === parseInt(qId))
+      return acc + (answers[qId] === q?.correct ? 1 : 0)
+    }, 0)
+  }, [answers])
 
   if (showResults) {
     const percentage = Math.round((score / totalQuestions) * 100)
@@ -125,6 +128,7 @@ export default function QuizPage(){
 
   return (
     <main>
+      {/* Header */}
       <section className="quiz-header">
         <div className="quiz-info">
           <h2>Network Security Fundamentals</h2>
@@ -143,6 +147,7 @@ export default function QuizPage(){
         </div>
       </section>
 
+      {/* Question */}
       <section className="quiz-question">
         <div className="question-card">
           <div className="question-header">
@@ -175,7 +180,7 @@ export default function QuizPage(){
             </div>
 
             {submitted && (
-              <div className="result">
+              <div className="result" aria-live="polite">
                 {selected === question.correct ? (
                   <p className="correct">✓ Correct! Well done.</p>
                 ) : (
@@ -214,15 +219,16 @@ export default function QuizPage(){
         </div>
       </section>
 
+      {/* Navigation */}
       <section className="quiz-navigation">
         <div className="question-list">
           <h4>Question Overview</h4>
           <div className="question-numbers">
             {quizQuestions.map((q, idx) => {
               const status = idx === currentQuestion ? 'current' : 
-                            answers[q.id] ? 'completed' : ''
+                             answers[q.id] ? 'completed' : ''
               return (
-                <span 
+                <button 
                   key={q.id} 
                   className={`q-number ${status}`}
                   onClick={() => {
@@ -232,7 +238,7 @@ export default function QuizPage(){
                   }}
                 >
                   {idx + 1}
-                </span>
+                </button>
               )
             })}
           </div>
@@ -241,3 +247,4 @@ export default function QuizPage(){
     </main>
   )
 }
+
