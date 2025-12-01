@@ -1,4 +1,7 @@
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../contexts/AuthContext'
+import './GroupCreation.css'
 
 const sampleResources = [
   'Professor Messer Security+ Course',
@@ -43,6 +46,8 @@ const existingGroups = [
 ]
 
 export default function GroupCreation(){
+  const navigate = useNavigate()
+  const { currentUser } = useAuth()
   const [form, setForm] = useState({ 
     name: '', 
     description: '', 
@@ -54,6 +59,7 @@ export default function GroupCreation(){
   })
   const [created, setCreated] = useState(null)
   const [errors, setErrors] = useState({})
+  const [joinedGroups, setJoinedGroups] = useState([])
 
   function handleChange(e){
     const { name, value } = e.target
@@ -81,7 +87,9 @@ export default function GroupCreation(){
   function handleSubmit(e){
     e.preventDefault()
     if (validateForm()) {
-      setCreated({ ...form, id: Date.now() })
+      const newGroup = { ...form, id: Date.now(), members: 1 }
+      setCreated(newGroup)
+      setJoinedGroups([...joinedGroups, newGroup])
       // Reset form
       setForm({ 
         name: '', 
@@ -92,6 +100,20 @@ export default function GroupCreation(){
         schedule: '',
         timezone: ''
       })
+      setTimeout(() => {
+        navigate('/forum')
+      }, 2000)
+    }
+  }
+
+  function handleJoinGroup(groupId) {
+    const group = existingGroups.find(g => g.id === groupId)
+    if (group && !joinedGroups.find(g => g.id === groupId)) {
+      setJoinedGroups([...joinedGroups, { ...group, joined: true }])
+      alert(`You've joined ${group.name}! Go to Forum to start chatting.`)
+      setTimeout(() => {
+        navigate('/forum')
+      }, 1500)
     }
   }
 
@@ -241,6 +263,9 @@ export default function GroupCreation(){
               <p><strong>Timezone:</strong> {created.timezone}</p>
               {created.description && <p><strong>Description:</strong> {created.description}</p>}
             </div>
+            <p style={{ marginTop: '1rem', color: '#2563eb' }}>
+              Redirecting to Forum to start chatting...
+            </p>
           </div>
         )}
       </section>
@@ -256,7 +281,14 @@ export default function GroupCreation(){
                 <span className="members">{group.members}/{group.maxMembers} members</span>
                 <span className={`difficulty ${group.difficulty}`}>{group.difficulty}</span>
               </div>
-              <button type="button" className="btn btn-outline">Join Group</button>
+              <button 
+                type="button" 
+                className="btn btn-outline"
+                onClick={() => handleJoinGroup(group.id)}
+                disabled={joinedGroups.find(g => g.id === group.id)}
+              >
+                {joinedGroups.find(g => g.id === group.id) ? 'Joined ✓' : 'Join Group'}
+              </button>
             </div>
           ))}
         </div>

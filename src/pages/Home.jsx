@@ -3,30 +3,48 @@ import { Link } from 'react-router-dom'
 
 const initialQuizzes = [
   { 
-    id: 1, 
+    id: 'network-security', 
     title: 'Network Security Fundamentals', 
     difficulty: 'beginner', 
-    questions: 15, 
+    questions: 5, 
     rating: 4.2,
     description: 'Test your knowledge of firewalls, VPNs, and network protocols. Perfect for Security+ preparation.',
     image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=200&fit=crop'
   },
   { 
-    id: 2, 
+    id: 'cryptography', 
     title: 'Cryptography & Encryption', 
     difficulty: 'intermediate', 
-    questions: 20, 
+    questions: 5, 
     rating: 4.8,
     description: 'Master symmetric and asymmetric encryption, hashing algorithms, and digital certificates.',
     image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=200&fit=crop'
   },
   { 
-    id: 3, 
+    id: 'incident-response', 
     title: 'Incident Response', 
     difficulty: 'advanced', 
-    questions: 25, 
+    questions: 5, 
     rating: 4.5,
     description: 'Learn the steps of incident response, from detection to recovery and lessons learned.',
+    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=200&fit=crop'
+  },
+  { 
+    id: 'risk-management', 
+    title: 'Risk Management', 
+    difficulty: 'intermediate', 
+    questions: 3, 
+    rating: 4.3,
+    description: 'Understand risk assessment, mitigation strategies, and security controls.',
+    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=200&fit=crop'
+  },
+  { 
+    id: 'compliance', 
+    title: 'Compliance & Regulations', 
+    difficulty: 'intermediate', 
+    questions: 3, 
+    rating: 4.6,
+    description: 'Learn about GDPR, HIPAA, PCI-DSS, and other compliance frameworks.',
     image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=200&fit=crop'
   }
 ]
@@ -148,7 +166,7 @@ export default function Home(){
                   <span className="questions">{q.questions} Questions</span>
                   <span className="rating">★★★★☆ ({q.rating})</span>
                 </div>
-                <Link to="/quiz" className="btn btn-card" onClick={() => window.scrollTo(0, 0)}>Take Quiz</Link>
+                <Link to={`/quiz/${q.id}`} className="btn btn-card" onClick={() => window.scrollTo(0, 0)}>Take Quiz</Link>
               </div>
             </article>
           ))}
@@ -190,7 +208,7 @@ export default function Home(){
                 <span className="members">{group.members} members</span>
                 <span className="next-session">Next: {group.nextSession}</span>
               </div>
-              <Link to="/groups" className="btn btn-outline">Join Group</Link>
+              <Link to="/login" className="btn btn-outline">Join Group</Link>
             </div>
           ))}
         </div>

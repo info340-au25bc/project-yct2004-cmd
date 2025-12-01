@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import CommentSection from '../components/CommentSection'
 
 const resources = [
   {
@@ -232,6 +233,8 @@ export default function Resources(){
           ))}
         </div>
       </section>
+
+      <CommentSection itemId="resources-page" itemType="resource" />
     </main>
   )
 }
