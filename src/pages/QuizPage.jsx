@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import CommentSection from '../components/CommentSection'
+import { pushData, writeData, readData } from '../utils/database'
 
 // Expanded quiz database
 const allQuizzes = {
@@ -298,7 +299,7 @@ const allQuizzes = {
   }
 }
 
-export default function QuizPage(){
+export default function QuizPage({ currentUser }){
   const { quizId } = useParams()
   const [selectedQuizId, setSelectedQuizId] = useState(quizId || 'network-security')
   const [currentQuestion, setCurrentQuestion] = useState(0)
@@ -380,6 +381,101 @@ export default function QuizPage(){
         </section>
       </main>
     )
+  }
+
+  // Save quiz results to Firebase when quiz is completed
+  React.useEffect(() => {
+    if (showResults && currentUser) {
+      const percentage = Math.round((score / totalQuestions) * 100)
+      const pointsEarned = score * 100
+      
+      // Save quiz result
+      const quizResult = {
+        userId: currentUser.uid,
+        userName: currentUser.displayName || currentUser.email || 'Anonymous',
+        quizId: selectedQuizId,
+        quizTitle: currentQuiz.title,
+        score: score,
+        totalQuestions: totalQuestions,
+        percentage: percentage,
+        points: pointsEarned,
+        timestamp: new Date().toISOString(),
+        answers: answers
+      }
+      
+      pushData('quizResults', quizResult).catch(error => {
+        console.error('Error saving quiz result:', error)
+      })
+      
+      // Update user stats
+      updateUserStats(currentUser.uid, score, totalQuestions, pointsEarned)
+    }
+  }, [showResults, currentUser, score, totalQuestions, selectedQuizId, currentQuiz.title, answers])
+
+  async function updateUserStats(userId, correctAnswers, totalQuestions, pointsEarned) {
+    try {
+      const statsPath = `userStats/${userId}`
+      
+      // Read current stats
+      const currentStats = await readData(statsPath)
+      
+      // Initialize stats if they don't exist
+      const baseStats = {
+        userId: userId,
+        userName: currentUser?.displayName || currentUser?.email || 'Anonymous',
+        totalPoints: 0,
+        totalQuizzes: 0,
+        totalCorrect: 0,
+        totalQuestions: 0,
+        currentStreak: 0,
+        lastQuizDate: null,
+        createdAt: new Date().toISOString()
+      }
+      
+      const existingStats = currentStats || baseStats
+      
+      // Calculate new stats
+      const today = new Date().toDateString()
+      const lastDate = existingStats.lastQuizDate ? new Date(existingStats.lastQuizDate).toDateString() : null
+      const yesterday = new Date(Date.now() - 86400000).toDateString()
+      
+      // Calculate streak
+      let newStreak = existingStats.currentStreak || 0
+      if (!lastDate) {
+        newStreak = 1
+      } else if (lastDate === today) {
+        // Same day, keep streak
+        newStreak = existingStats.currentStreak || 0
+      } else if (lastDate === yesterday) {
+        // Consecutive day, increment streak
+        newStreak = (existingStats.currentStreak || 0) + 1
+      } else {
+        // Streak broken, reset to 1
+        newStreak = 1
+      }
+      
+      const updatedStats = {
+        ...baseStats,
+        ...existingStats,
+        totalPoints: (existingStats.totalPoints || 0) + pointsEarned,
+        totalQuizzes: (existingStats.totalQuizzes || 0) + 1,
+        totalCorrect: (existingStats.totalCorrect || 0) + correctAnswers,
+        totalQuestions: (existingStats.totalQuestions || 0) + totalQuestions,
+        currentStreak: newStreak,
+        lastQuizDate: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      }
+      
+      // Calculate accuracy
+      updatedStats.accuracy = updatedStats.totalQuestions > 0 
+        ? Math.round((updatedStats.totalCorrect / updatedStats.totalQuestions) * 100)
+        : 0
+      
+      // Save updated stats
+      await writeData(statsPath, updatedStats)
+    } catch (error) {
+      console.error('Error updating user stats:', error)
+    }
   }
 
   if (showResults) {
@@ -559,7 +655,7 @@ export default function QuizPage(){
         </div>
       </section>
 
-      <CommentSection itemId={`quiz-${selectedQuizId}`} itemType="quiz" />
+      <CommentSection itemId={`quiz-${selectedQuizId}`} itemType="quiz" currentUser={currentUser} />
     </main>
   )
 }

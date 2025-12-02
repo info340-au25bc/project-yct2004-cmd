@@ -1,20 +1,19 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../contexts/AuthContext'
+import { signInWithGoogle } from '../utils/auth'
 import './Login.css'
 
-export default function Login() {
+export default function Login({ currentUser, firebaseReady, onSignIn }) {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const { signInWithGoogle, currentUser, firebaseReady } = useAuth()
   const navigate = useNavigate()
 
   // Redirect if already logged in
-      useEffect(() => {
-        if (currentUser) {
-          navigate('/forum')
-        }
-      }, [currentUser, navigate])
+  useEffect(() => {
+    if (currentUser) {
+      navigate('/forum')
+    }
+  }, [currentUser, navigate])
 
   async function handleGoogleSignIn(e) {
     e.preventDefault()
@@ -28,6 +27,9 @@ export default function Login() {
       }
       
       await signInWithGoogle()
+      if (onSignIn) {
+        onSignIn()
+      }
       // Navigation will happen automatically via useEffect when currentUser updates
       setTimeout(() => {
         navigate('/forum')

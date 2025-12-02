@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react'
-import { useAuth } from '../contexts/AuthContext'
 import { Link } from 'react-router-dom'
 import './Forum.css'
 
-export default function Forum() {
-  const { currentUser } = useAuth()
+export default function Forum({ currentUser }) {
   const [activeTab, setActiveTab] = useState('discussions')
   const defaultDiscussions = [
     {
@@ -191,22 +189,22 @@ export default function Forum() {
         </div>
       )}
 
-      {activeTab === 'groups' && (
-        <div className="forum-content">
-          <GroupsTab />
-        </div>
-      )}
+          {activeTab === 'groups' && (
+            <div className="forum-content">
+              <GroupsTab currentUser={currentUser} />
+            </div>
+          )}
 
-      {activeTab === 'courses' && (
-        <div className="forum-content">
-          <CoursesTab />
-        </div>
-      )}
+          {activeTab === 'courses' && (
+            <div className="forum-content">
+              <CoursesTab currentUser={currentUser} />
+            </div>
+          )}
     </main>
   )
 }
 
-function GroupsTab() {
+function GroupsTab({ currentUser }) {
   const [myGroups, setMyGroups] = useState([
     {
       id: 1,
@@ -220,7 +218,6 @@ function GroupsTab() {
   const [selectedGroup, setSelectedGroup] = useState(null)
   const [chatMessages, setChatMessages] = useState({})
   const [newMessage, setNewMessage] = useState('')
-  const { currentUser } = useAuth()
 
   function openChat(groupId) {
     setSelectedGroup(groupId)
@@ -336,8 +333,7 @@ function GroupsTab() {
   )
 }
 
-function CoursesTab() {
-  const { currentUser } = useAuth()
+function CoursesTab({ currentUser }) {
   const [myCourses, setMyCourses] = useState([])
   const [availableCourses] = useState([
     'Professor Messer Security+ Course',

@@ -4,6 +4,7 @@ export default function Proposal(){
   return (
     <main>
       <section>
+        <h1>Project Proposal</h1>
         <h2>Problem/Data Domain</h2>
         <p>
           Cybersecurity awareness represents a critical challenge in our increasingly digital world, where individuals and organizations face constant threats from phishing attacks, malware, social engineering, and data breaches. Despite the growing sophistication of cyber threats, many people lack fundamental knowledge about online safety practices, password security, and recognizing common attack vectors. According to the <a href="https://www.verizon.com/business/resources/reports/dbir/" target="_blank" rel="noreferrer">2023 Verizon Data Breach Investigations Report</a>, 74% of breaches involve human error, highlighting a significant gap in cybersecurity literacy across all demographics. This knowledge deficit affects everyone from students and remote workers to small business owners, making cybersecurity education not just a technical issue but a social imperative.

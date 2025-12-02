@@ -1,17 +1,13 @@
 import React from 'react'
 import { Link, NavLink } from 'react-router-dom'
-import { useAuth } from '../contexts/AuthContext'
 
-export default function Header() {
+export default function Header({ currentUser, firebaseReady, onLogout }) {
   const makeNavClass = ({ isActive }) =>
     isActive ? 'nav-link active' : 'nav-link'
-  const { currentUser, logout } = useAuth()
 
   async function handleLogout() {
-    try {
-      await logout()
-    } catch (error) {
-      console.error('Failed to log out:', error)
+    if (onLogout) {
+      await onLogout()
     }
   }
 

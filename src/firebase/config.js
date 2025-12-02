@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app'
 import { getAuth, GoogleAuthProvider } from 'firebase/auth'
-import { getFirestore } from 'firebase/firestore'
+import { getDatabase } from 'firebase/database'
 
 // Firebase configuration from Firebase Console
 const firebaseConfig = {
@@ -10,7 +10,8 @@ const firebaseConfig = {
   storageBucket: "info340-final-project-74082.firebasestorage.app",
   messagingSenderId: "74694856180",
   appId: "1:74694856180:web:b9f3964e69958b89c1fda1",
-  measurementId: "G-25TD8VG3NJ"
+  measurementId: "G-25TD8VG3NJ",
+  databaseURL: "https://info340-final-project-74082-default-rtdb.firebaseio.com/"
 }
 
 // Check if Firebase is properly configured
@@ -32,7 +33,7 @@ if (isFirebaseConfigured) {
     googleProvider = new GoogleAuthProvider()
     googleProvider.addScope('profile')
     googleProvider.addScope('email')
-    db = getFirestore(app)
+    db = getDatabase(app)
   } catch (error) {
     console.error('Firebase initialization error:', error)
     console.warn('Firebase initialization failed. Authentication will not work.')

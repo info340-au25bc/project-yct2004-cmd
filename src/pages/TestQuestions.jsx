@@ -1,7 +1,9 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import { subscribeToData, pushData, deleteData } from '../utils/database'
 
-export default function TestQuestions() {
+export default function TestQuestions({ currentUser }) {
   const [questions, setQuestions] = useState([])
+  const [loading, setLoading] = useState(true)
   const [formData, setFormData] = useState({
     question: '',
     optionA: '',
@@ -15,41 +17,67 @@ export default function TestQuestions() {
   })
   const [showForm, setShowForm] = useState(false)
   const [feedback, setFeedback] = useState({})
+  const [message, setMessage] = useState({ text: '', type: '' })
+
+  // Load questions from Firebase
+  useEffect(() => {
+    const unsubscribe = subscribeToData('questions', (data) => {
+      if (data) {
+        const questionsArray = Object.values(data)
+        setQuestions(questionsArray)
+      }
+      setLoading(false)
+    })
+
+    return () => {
+      if (unsubscribe) unsubscribe()
+    }
+  }, [])
 
   function handleChange(e) {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault()
     if (!formData.question || !formData.correctAnswer) {
-      alert('Please fill in the question and select the correct answer')
+      setMessage({ text: 'Please fill in the question and select the correct answer', type: 'error' })
+      setTimeout(() => setMessage({ text: '', type: '' }), 3000)
       return
     }
 
     const newQuestion = {
       id: Date.now(),
       ...formData,
-      author: 'You', // In production, this would come from auth
+      author: currentUser?.displayName || currentUser?.email || 'Anonymous',
+      authorId: currentUser?.uid || 'anonymous',
       createdAt: new Date().toISOString(),
       feedback: []
     }
 
-    setQuestions([newQuestion, ...questions])
-    setFormData({
-      question: '',
-      optionA: '',
-      optionB: '',
-      optionC: '',
-      optionD: '',
-      correctAnswer: '',
-      explanation: '',
-      category: '',
-      difficulty: ''
-    })
-    setShowForm(false)
-    alert('Question created successfully!')
+    try {
+      // Save to Firebase
+      await pushData('questions', newQuestion)
+      setFormData({
+        question: '',
+        optionA: '',
+        optionB: '',
+        optionC: '',
+        optionD: '',
+        correctAnswer: '',
+        explanation: '',
+        category: '',
+        difficulty: ''
+      })
+      setShowForm(false)
+      setMessage({ text: 'Question created successfully!', type: 'success' })
+      setTimeout(() => setMessage({ text: '', type: '' }), 3000)
+    } catch (error) {
+      console.error('Error creating question:', error)
+      setMessage({ text: 'Error creating question. Please try again.', type: 'error' })
+      setTimeout(() => setMessage({ text: '', type: '' }), 3000)
+    }
   }
 
   function handleFeedback(questionId, feedbackText) {
@@ -68,14 +96,45 @@ export default function TestQuestions() {
     setFeedback({ ...feedback, [questionId]: '' })
   }
 
+  const [deleteConfirm, setDeleteConfirm] = useState(null)
+
   function handleDelete(questionId) {
-    if (window.confirm('Are you sure you want to delete this question?')) {
-      setQuestions(questions.filter(q => q.id !== questionId))
+    setDeleteConfirm(questionId)
+  }
+
+  async function confirmDelete(questionId) {
+    try {
+      // Find question key in Firebase
+      const unsubscribe = subscribeToData('questions', async (data) => {
+        if (data) {
+          const questionsArray = Object.entries(data)
+          const foundEntry = questionsArray.find(([key, q]) => q.id === questionId)
+          if (foundEntry) {
+            await deleteData(`questions/${foundEntry[0]}`)
+          }
+        }
+      })
+      setDeleteConfirm(null)
+      setMessage({ text: 'Question deleted successfully', type: 'success' })
+      setTimeout(() => setMessage({ text: '', type: '' }), 3000)
+    } catch (error) {
+      console.error('Error deleting question:', error)
+      setMessage({ text: 'Error deleting question. Please try again.', type: 'error' })
+      setTimeout(() => setMessage({ text: '', type: '' }), 3000)
     }
+  }
+
+  function cancelDelete() {
+    setDeleteConfirm(null)
   }
 
   return (
     <main className="test-questions-page">
+      {message.text && (
+        <div className={`message ${message.type === 'error' ? 'error-message' : 'success-message'}`}>
+          {message.text}
+        </div>
+      )}
       <section className="questions-header">
         <div>
           <h2>📝 Question Creator</h2>
@@ -265,6 +324,13 @@ export default function TestQuestions() {
                   >
                     🗑️ Delete
                   </button>
+                  {deleteConfirm === question.id && (
+                    <div className="delete-confirmation">
+                      <p>Are you sure you want to delete this question?</p>
+                      <button onClick={() => confirmDelete(question.id)} className="btn btn-danger">Yes, Delete</button>
+                      <button onClick={cancelDelete} className="btn btn-outline">Cancel</button>
+                    </div>
+                  )}
                 </div>
 
                 <p className="question-text">{question.question}</p>

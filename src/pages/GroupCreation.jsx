@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../contexts/AuthContext'
 import './GroupCreation.css'
 
 const sampleResources = [
@@ -45,9 +44,8 @@ const existingGroups = [
   }
 ]
 
-export default function GroupCreation(){
+export default function GroupCreation({ currentUser }){
   const navigate = useNavigate()
-  const { currentUser } = useAuth()
   const [form, setForm] = useState({ 
     name: '', 
     description: '', 
@@ -106,11 +104,13 @@ export default function GroupCreation(){
     }
   }
 
+  const [joinMessage, setJoinMessage] = useState('')
+
   function handleJoinGroup(groupId) {
     const group = existingGroups.find(g => g.id === groupId)
     if (group && !joinedGroups.find(g => g.id === groupId)) {
       setJoinedGroups([...joinedGroups, { ...group, joined: true }])
-      alert(`You've joined ${group.name}! Go to Forum to start chatting.`)
+      setJoinMessage(`You've joined ${group.name}! Redirecting to Forum...`)
       setTimeout(() => {
         navigate('/forum')
       }, 1500)
@@ -125,7 +125,7 @@ export default function GroupCreation(){
       </section>
 
       <section className="group-form-section">
-        <h2>Group Creation Form</h2>
+        <h3>Group Creation Form</h3>
         <form onSubmit={handleSubmit} aria-label="Create study group">
           <div className="form-group">
             <label htmlFor="group-name">Group Name:</label>
@@ -270,6 +270,11 @@ export default function GroupCreation(){
         )}
       </section>
 
+      {joinMessage && (
+        <div className="success-message">
+          {joinMessage}
+        </div>
+      )}
       <section className="existing-groups">
         <h2>Join Existing Groups</h2>
         <div className="groups-grid">
