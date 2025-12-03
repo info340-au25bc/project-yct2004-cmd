@@ -15,11 +15,19 @@ function getRef(path) {
 export async function writeData(path, data) {
   try {
     const dbRef = getRef(path)
-    if (!dbRef) return null
+    if (!dbRef) {
+      console.error('❌ writeData: Database reference is null for path:', path)
+      throw new Error('Database not initialized')
+    }
+    console.log('💾 writeData: Writing to path:', path)
+    console.log('📦 writeData: Data:', data)
     await set(dbRef, data)
+    console.log('✅ writeData: Successfully wrote to:', path)
     return true
   } catch (error) {
-    console.error('Error writing to database:', error)
+    console.error('❌ writeData: Error writing to database:', error)
+    console.error('writeData: Path was:', path)
+    console.error('writeData: Error code:', error.code, 'Message:', error.message)
     throw error
   }
 }
@@ -28,12 +36,19 @@ export async function writeData(path, data) {
 export async function pushData(path, data) {
   try {
     const dbRef = getRef(path)
-    if (!dbRef) return null
+    if (!dbRef) {
+      console.error('❌ pushData: Database reference is null for path:', path)
+      return null
+    }
+    console.log('💾 pushData: Pushing to path:', path)
+    console.log('📦 pushData: Data:', data)
     const newRef = push(dbRef)
     await set(newRef, data)
+    console.log('✅ pushData: Successfully pushed to:', path, 'Key:', newRef.key)
     return newRef.key
   } catch (error) {
-    console.error('Error pushing to database:', error)
+    console.error('❌ pushData: Error pushing to database:', error)
+    console.error('pushData: Path was:', path, 'Error code:', error.code)
     throw error
   }
 }
@@ -43,14 +58,25 @@ export function readData(path) {
   return new Promise((resolve, reject) => {
     const dbRef = getRef(path)
     if (!dbRef) {
+      console.warn('readData: Database reference is null for path:', path)
       resolve(null)
       return
     }
 
     let resolved = false
+    const timeout = setTimeout(() => {
+      if (!resolved) {
+        resolved = true
+        console.warn('readData: Timeout reading from path:', path)
+        unsubscribe()
+        resolve(null) // Return null on timeout instead of rejecting
+      }
+    }, 10000) // 10 second timeout
+
     const unsubscribe = onValue(dbRef, (snapshot) => {
       if (!resolved) {
         resolved = true
+        clearTimeout(timeout)
         const data = snapshot.val()
         unsubscribe()
         resolve(data)
@@ -58,9 +84,12 @@ export function readData(path) {
     }, (error) => {
       if (!resolved) {
         resolved = true
-        console.error('Error reading from database:', error)
+        clearTimeout(timeout)
+        console.error('readData: Error reading from database:', error)
+        console.error('readData: Path was:', path, 'Error code:', error?.code)
         unsubscribe()
-        reject(error)
+        // Don't reject - return null so the code can handle missing data
+        resolve(null)
       }
     })
   })
@@ -70,20 +99,27 @@ export function readData(path) {
 export function subscribeToData(path, callback) {
   const dbRef = getRef(path)
   if (!dbRef) {
+    console.error('❌ subscribeToData: Database reference is null for path:', path)
     callback(null)
     return () => {}
   }
 
+  console.log('👂 subscribeToData: Subscribing to path:', path)
+  
   onValue(dbRef, (snapshot) => {
     const data = snapshot.val()
+    console.log('📥 subscribeToData: Received data from:', path, data ? 'Has data' : 'No data (null)')
     callback(data)
   }, (error) => {
-    console.error('Error subscribing to database:', error)
+    console.error('❌ subscribeToData: Error subscribing to database:', error)
+    console.error('subscribeToData: Path was:', path)
+    console.error('subscribeToData: Error code:', error?.code, 'Message:', error?.message)
     callback(null)
   })
 
   // Return unsubscribe function
   return () => {
+    console.log('🔇 subscribeToData: Unsubscribing from:', path)
     off(dbRef)
   }
 }

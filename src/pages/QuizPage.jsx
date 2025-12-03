@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import CommentSection from '../components/CommentSection'
 import { pushData, writeData, readData } from '../utils/database'
@@ -308,111 +308,34 @@ export default function QuizPage({ currentUser }){
   const [answers, setAnswers] = useState({})
   const [showResults, setShowResults] = useState(false)
   const [showQuizSelector, setShowQuizSelector] = useState(!quizId)
+  const [quizStartTime, setQuizStartTime] = useState(null)
+  const [statsSaved, setStatsSaved] = useState(false)
 
   const currentQuiz = allQuizzes[selectedQuizId] || allQuizzes['network-security']
-  const question = currentQuiz.questions[currentQuestion]
-  const totalQuestions = currentQuiz.questions.length
-  const progress = ((currentQuestion + 1) / totalQuestions) * 100
-
-  function handleSubmit(e){
-    e.preventDefault()
-    if (!selected) return
-    setAnswers(prev => ({ ...prev, [question.id]: selected }))
-    setSubmitted(true)
-  }
-
-  function handleNext(){
-    if (currentQuestion < totalQuestions - 1) {
-      setCurrentQuestion(prev => prev + 1)
-      setSelected(answers[currentQuiz.questions[currentQuestion + 1]?.id] || '')
-      setSubmitted(false)
-    } else {
-      setShowResults(true)
-    }
-  }
-
-  function handlePrevious(){
-    if (currentQuestion > 0) {
-      setCurrentQuestion(prev => prev - 1)
-      setSelected(answers[currentQuiz.questions[currentQuestion - 1]?.id] || '')
-      setSubmitted(false)
-    }
-  }
-
-  function startQuiz(quizId) {
-    setSelectedQuizId(quizId)
-    setCurrentQuestion(0)
-    setSelected('')
-    setAnswers({})
-    setSubmitted(false)
-    setShowResults(false)
-    setShowQuizSelector(false)
-  }
+  const totalQuestions = currentQuiz?.questions?.length || 0
+  const question = currentQuiz?.questions?.[currentQuestion]
+  const progress = totalQuestions > 0 ? ((currentQuestion + 1) / totalQuestions) * 100 : 0
 
   const score = Object.keys(answers).reduce((acc, qId) => {
-    const q = currentQuiz.questions.find(q => q.id === parseInt(qId))
+    const q = currentQuiz?.questions?.find(q => q.id === parseInt(qId))
     return acc + (answers[qId] === q?.correct ? 1 : 0)
   }, 0)
 
-  if (showQuizSelector) {
-    return (
-      <main>
-        <section className="quiz-selector-section">
-          <h2>Select a Quiz</h2>
-          <p>Choose a quiz to test your cybersecurity knowledge</p>
-          <div className="quizzes-grid">
-            {Object.values(allQuizzes).map(quiz => (
-              <div key={quiz.id} className="quiz-selector-card">
-                <h3>{quiz.title}</h3>
-                <p>{quiz.description}</p>
-                <div className="quiz-meta">
-                  <span className={`difficulty ${quiz.difficulty}`}>{quiz.difficulty}</span>
-                  <span className="question-count">{quiz.questions.length} Questions</span>
-                </div>
-                <button
-                  onClick={() => startQuiz(quiz.id)}
-                  className="btn btn-primary"
-                >
-                  Start Quiz
-                </button>
-              </div>
-            ))}
-          </div>
-        </section>
-      </main>
-    )
-  }
-
-  // Save quiz results to Firebase when quiz is completed
-  React.useEffect(() => {
-    if (showResults && currentUser) {
-      const percentage = Math.round((score / totalQuestions) * 100)
-      const pointsEarned = score * 100
-      
-      // Save quiz result
-      const quizResult = {
-        userId: currentUser.uid,
-        userName: currentUser.displayName || currentUser.email || 'Anonymous',
-        quizId: selectedQuizId,
-        quizTitle: currentQuiz.title,
-        score: score,
-        totalQuestions: totalQuestions,
-        percentage: percentage,
-        points: pointsEarned,
-        timestamp: new Date().toISOString(),
-        answers: answers
-      }
-      
-      pushData('quizResults', quizResult).catch(error => {
-        console.error('Error saving quiz result:', error)
-      })
-      
-      // Update user stats
-      updateUserStats(currentUser.uid, score, totalQuestions, pointsEarned)
+  // Sync URL param with state (only when URL param changes, not on manual selection)
+  useEffect(() => {
+    if (quizId && quizId !== selectedQuizId && allQuizzes[quizId]) {
+      setSelectedQuizId(quizId)
+      setShowQuizSelector(false)
+      setCurrentQuestion(0)
+      setSelected('')
+      setAnswers({})
+      setSubmitted(false)
+      setShowResults(false)
     }
-  }, [showResults, currentUser, score, totalQuestions, selectedQuizId, currentQuiz.title, answers])
+  }, [quizId, selectedQuizId]) // Only depend on quizId, not selectedQuizId
 
-  async function updateUserStats(userId, correctAnswers, totalQuestions, pointsEarned) {
+  // Define updateUserStats function before useEffect
+  async function updateUserStats(userId, correctAnswers, totalQuestions, pointsEarned, duration = 0) {
     try {
       const statsPath = `userStats/${userId}`
       
@@ -454,13 +377,23 @@ export default function QuizPage({ currentUser }){
         newStreak = 1
       }
       
+      // Calculate average duration
+      const totalDuration = (existingStats.totalDuration || 0) + duration
+      const quizCount = (existingStats.totalQuizzes || 0) + 1
+      const averageDuration = quizCount > 0 ? Math.round(totalDuration / quizCount) : duration
+      
       const updatedStats = {
         ...baseStats,
         ...existingStats,
+        // Preserve or update userName
+        userName: existingStats.userName || currentUser?.displayName || currentUser?.email || 'Anonymous',
+        userId: userId,
         totalPoints: (existingStats.totalPoints || 0) + pointsEarned,
-        totalQuizzes: (existingStats.totalQuizzes || 0) + 1,
+        totalQuizzes: quizCount,
         totalCorrect: (existingStats.totalCorrect || 0) + correctAnswers,
         totalQuestions: (existingStats.totalQuestions || 0) + totalQuestions,
+        totalDuration: totalDuration,
+        averageDuration: averageDuration,
         currentStreak: newStreak,
         lastQuizDate: new Date().toISOString(),
         updatedAt: new Date().toISOString()
@@ -473,18 +406,178 @@ export default function QuizPage({ currentUser }){
       
       // Save updated stats
       await writeData(statsPath, updatedStats)
+      return updatedStats
     } catch (error) {
       console.error('Error updating user stats:', error)
+      throw error
     }
+  }
+
+  // Save quiz results to Firebase when quiz is completed
+  useEffect(() => {
+    if (showResults && currentUser && currentUser.uid) {
+      console.log('📝 Quiz completed! Starting to save to Firebase...')
+      console.log('👤 User:', currentUser.displayName || currentUser.email)
+      console.log('🆔 User ID:', currentUser.uid)
+      
+      const percentage = Math.round((score / totalQuestions) * 100)
+      const pointsEarned = score * 100
+      
+      // Calculate quiz duration in seconds
+      const duration = quizStartTime 
+        ? Math.round((new Date() - quizStartTime) / 1000) 
+        : 0
+      
+      // Save quiz result
+      const quizResult = {
+        userId: currentUser.uid,
+        userName: currentUser.displayName || currentUser.email || 'Anonymous',
+        quizId: selectedQuizId,
+        quizTitle: currentQuiz?.title || 'Unknown Quiz',
+        score: score,
+        totalQuestions: totalQuestions,
+        percentage: percentage,
+        points: pointsEarned,
+        duration: duration, // Duration in seconds
+        timestamp: new Date().toISOString(),
+        answers: answers
+      }
+      
+      console.log('💾 Saving quiz result to Firebase:', {
+        path: 'quizResults',
+        data: quizResult
+      })
+      
+      pushData('quizResults', quizResult)
+        .then((key) => {
+          console.log('✅ Quiz result saved successfully! Key:', key)
+          console.log('📍 Check Firebase Console at: quizResults/' + key)
+        })
+        .catch(error => {
+          console.error('❌ Error saving quiz result:', error)
+          console.error('Error details:', error.message, error.code)
+        })
+      
+      // Update user stats
+      console.log('📊 Updating user stats in Firebase...')
+      updateUserStats(currentUser.uid, score, totalQuestions, pointsEarned, duration)
+        .then((updatedStats) => {
+          console.log('✅ User stats updated successfully!', updatedStats)
+          console.log('📍 Check Firebase Console at: userStats/' + currentUser.uid)
+          setStatsSaved(true)
+          return updatedStats
+        })
+        .catch(error => {
+          console.error('❌ Failed to update user stats:', error)
+          console.error('Error details:', error.message, error.code)
+          // Try to save a simplified version directly
+          const fallbackStats = {
+            userId: currentUser.uid,
+            userName: currentUser.displayName || currentUser.email || 'Anonymous',
+            totalPoints: pointsEarned,
+            totalQuizzes: 1,
+            totalCorrect: score,
+            totalQuestions: totalQuestions,
+            accuracy: Math.round((score / totalQuestions) * 100),
+            currentStreak: 1,
+            lastQuizDate: new Date().toISOString(),
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          }
+          return writeData(`userStats/${currentUser.uid}`, fallbackStats)
+            .then(() => {
+              setStatsSaved(true)
+              return fallbackStats
+            })
+            .catch(fallbackError => {
+              console.error('Fallback save also failed:', fallbackError)
+              throw fallbackError
+            })
+        })
+    }
+  }, [showResults, currentUser, score, totalQuestions, selectedQuizId, currentQuiz?.title, answers, quizStartTime])
+
+  function handleSubmit(e){
+    e.preventDefault()
+    if (!selected || !question) return
+    setAnswers(prev => ({ ...prev, [question.id]: selected }))
+    setSubmitted(true)
+  }
+
+  function handleNext(){
+    if (currentQuestion < totalQuestions - 1 && currentQuiz?.questions) {
+      const nextIndex = currentQuestion + 1
+      setCurrentQuestion(nextIndex)
+      setSelected(answers[currentQuiz.questions[nextIndex]?.id] || '')
+      setSubmitted(false)
+    } else {
+      setShowResults(true)
+    }
+  }
+
+  function handlePrevious(){
+    if (currentQuestion > 0 && currentQuiz?.questions) {
+      const prevIndex = currentQuestion - 1
+      setCurrentQuestion(prevIndex)
+      setSelected(answers[currentQuiz.questions[prevIndex]?.id] || '')
+      setSubmitted(false)
+    }
+  }
+
+  function startQuiz(quizId) {
+    const quiz = allQuizzes[quizId]
+    if (!quiz || !quiz.questions || quiz.questions.length === 0) {
+      console.error('Quiz not found or invalid:', quizId)
+      return
+    }
+    // Reset all state before starting quiz
+    setSelectedQuizId(quizId)
+    setCurrentQuestion(0)
+    setSelected('')
+    setAnswers({})
+    setSubmitted(false)
+    setShowResults(false)
+    setShowQuizSelector(false)
+    setStatsSaved(false)
+    setQuizStartTime(new Date()) // Track when quiz starts
+  }
+
+  if (showQuizSelector) {
+    return (
+      <main>
+        <section className="quiz-selector-section" aria-labelledby="quiz-selector-heading">
+          <h1 id="quiz-selector-heading">Select a Quiz</h1>
+          <p>Choose a quiz to test your cybersecurity knowledge</p>
+          <div className="quizzes-grid">
+            {Object.values(allQuizzes).map(quiz => (
+              <div key={quiz.id} className="quiz-selector-card">
+                <h3>{quiz.title}</h3>
+                <p>{quiz.description}</p>
+                <div className="quiz-meta">
+                  <span className={`difficulty ${quiz.difficulty}`}>{quiz.difficulty}</span>
+                  <span className="question-count">{quiz.questions.length} Questions</span>
+                </div>
+                <button
+                  onClick={() => startQuiz(quiz.id)}
+                  className="btn btn-primary"
+                >
+                  Start Quiz
+                </button>
+              </div>
+            ))}
+          </div>
+        </section>
+      </main>
+    )
   }
 
   if (showResults) {
     const percentage = Math.round((score / totalQuestions) * 100)
     return (
       <main>
-        <section className="quiz-results">
+        <section className="quiz-results" aria-labelledby="results-heading">
           <div className="results-card">
-            <h3>Quiz Completed!</h3>
+            <h1 id="results-heading">Quiz Completed!</h1>
             <div className="score-display">
               <div className="score-circle">
                 <span className="score-number">{percentage}%</span>
@@ -501,6 +594,22 @@ export default function QuizPage({ currentUser }){
                 <span className="summary-value">{score * 100} pts</span>
               </div>
             </div>
+            {currentUser && (
+              <div style={{ 
+                marginTop: '1rem', 
+                padding: '0.75rem', 
+                borderRadius: '8px',
+                backgroundColor: statsSaved ? '#d4edda' : '#fff3cd',
+                border: `1px solid ${statsSaved ? '#c3e6cb' : '#ffeaa7'}`,
+                color: statsSaved ? '#155724' : '#856404'
+              }}>
+                {statsSaved ? (
+                  <span>✅ Your score has been saved to the leaderboard!</span>
+                ) : (
+                  <span>⏳ Saving your score to the leaderboard...</span>
+                )}
+              </div>
+            )}
             <div className="results-actions">
               <button 
                 className="btn btn-primary" 
@@ -510,62 +619,152 @@ export default function QuizPage({ currentUser }){
                   setAnswers({})
                   setShowResults(false)
                   setSubmitted(false)
+                  setQuizStartTime(new Date().getTime())
                 }}
               >
                 Retake Quiz
               </button>
               <button
                 className="btn btn-secondary"
-                onClick={() => setShowQuizSelector(true)}
+                onClick={() => {
+                  setShowQuizSelector(true)
+                  setShowResults(false)
+                  setCurrentQuestion(0)
+                  setSelected('')
+                  setAnswers({})
+                  setSubmitted(false)
+                  setQuizStartTime(null)
+                }}
               >
                 Choose Another Quiz
               </button>
-              <Link to="/ranking" className="btn btn-secondary">View Leaderboard</Link>
+              <Link 
+                to="/ranking" 
+                className="btn btn-secondary"
+              >
+                View Leaderboard
+              </Link>
             </div>
+            {!currentUser && (
+              <div role="alert" style={{ marginTop: '1rem', padding: '1rem', background: '#fff3cd', borderRadius: '8px', color: '#856404' }}>
+                <strong>⚠️ Note:</strong> You must be logged in for your score to be saved to the leaderboard.
+              </div>
+            )}
           </div>
         </section>
       </main>
     )
   }
 
+  // Safety check: only show error if we're trying to display quiz but data is invalid
+  // If showQuizSelector is true, we'll show selector (handled above)
+  // If showResults is true, we'll show results (handled above)  
+  // Otherwise, we should show the quiz - but only if data is valid
+  if (!showQuizSelector && !showResults) {
+    // Validate quiz data exists
+    if (!currentQuiz || !currentQuiz.questions || currentQuiz.questions.length === 0) {
+      return (
+        <main>
+          <section className="quiz-selector-section">
+            <div className="error-message">
+              <h2>Quiz Not Available</h2>
+              <p>The selected quiz could not be loaded. Please try selecting another quiz.</p>
+              <button
+                onClick={() => setShowQuizSelector(true)}
+                className="btn btn-primary"
+              >
+                Select a Quiz
+              </button>
+            </div>
+          </section>
+        </main>
+      )
+    }
+    
+    // Ensure currentQuestion index is valid - fix it if needed
+    if (currentQuestion < 0 || currentQuestion >= currentQuiz.questions.length) {
+      // Reset to first question if index is invalid
+      setCurrentQuestion(0)
+      // Return early to let state update, component will re-render
+      return (
+        <main>
+          <section className="quiz-header">
+            <div className="quiz-info">
+              <h2>Loading quiz...</h2>
+            </div>
+          </section>
+        </main>
+      )
+    }
+    
+    // Final validation: question must exist
+    if (!question) {
+      return (
+        <main>
+          <section className="quiz-selector-section">
+            <div className="error-message">
+              <h2>Question Not Available</h2>
+              <p>The question could not be loaded. Please try selecting another quiz.</p>
+              <button
+                onClick={() => setShowQuizSelector(true)}
+                className="btn btn-primary"
+              >
+                Select a Quiz
+              </button>
+            </div>
+          </section>
+        </main>
+      )
+    }
+  }
+
   return (
     <main>
-      <section className="quiz-header">
+      <section className="quiz-header" aria-labelledby="quiz-title">
         <div className="quiz-info">
-          <h2>{currentQuiz.title}</h2>
+          <h1 id="quiz-title">{currentQuiz.title}</h1>
           <p>{currentQuiz.description}</p>
           <div className="quiz-stats">
             <span className="stat">{totalQuestions} Questions</span>
             <span className="stat">{currentQuiz.difficulty}</span>
             <button
-              onClick={() => setShowQuizSelector(true)}
+              onClick={() => {
+                setShowQuizSelector(true)
+                setShowResults(false)
+                setCurrentQuestion(0)
+                setSelected('')
+                setAnswers({})
+                setSubmitted(false)
+              }}
               className="btn btn-sm btn-outline"
             >
               Change Quiz
             </button>
           </div>
         </div>
-        <div className="quiz-progress">
+        <div className="quiz-progress" role="progressbar" aria-valuenow={currentQuestion + 1} aria-valuemin={1} aria-valuemax={totalQuestions} aria-label="Quiz progress">
           <div className="progress-bar">
-            <div className="progress-fill" style={{ width: `${progress}%` }}></div>
+            <div className="progress-fill" style={{ width: `${progress}%` }} aria-hidden="true"></div>
           </div>
           <span className="progress-text">Question {currentQuestion + 1} of {totalQuestions}</span>
         </div>
       </section>
 
-      <section className="quiz-question">
+      <section className="quiz-question" aria-labelledby="question-heading">
         <div className="question-card">
           <div className="question-header">
-            <h3>Question {currentQuestion + 1}</h3>
+            <h2 id="question-heading">Question {currentQuestion + 1}</h2>
           </div>
           
-          <div className="question-content">
-            <p>{question.text}</p>
+          <div className="question-content" role="region" aria-live="polite">
+            <p>{question?.text || 'Loading question...'}</p>
           </div>
 
-          <form className="quiz-form" onSubmit={handleSubmit}>
-            <div className="answer-options">
-              {question.options.map(opt => (
+          <form className="quiz-form" onSubmit={handleSubmit} aria-label="Quiz question form">
+            <fieldset>
+              <legend className="sr-only">Answer options</legend>
+              <div className="answer-options" role="radiogroup" aria-labelledby="question-heading">
+              {question?.options?.map(opt => (
                 <label key={opt.id} className="option-label">
                   <input 
                     type="radio" 
@@ -574,14 +773,15 @@ export default function QuizPage({ currentUser }){
                     className="option-input"
                     checked={selected === opt.id}
                     onChange={() => setSelected(opt.id)}
+                    aria-label={`Option ${opt.id}: ${opt.text}`}
                   />
                   <span className="option-text">{opt.text}</span>
                 </label>
               ))}
             </div>
 
-            {submitted && (
-              <div className="result">
+            {submitted && question && (
+              <div className="result" role="status" aria-live="polite">
                 {selected === question.correct ? (
                   <div className="correct">
                     <p>✓ Correct! Well done.</p>
@@ -591,7 +791,7 @@ export default function QuizPage({ currentUser }){
                   </div>
                 ) : (
                   <div className="incorrect">
-                    <p>✗ Incorrect. The correct answer is option {question.correct.toUpperCase()}.</p>
+                    <p>✗ Incorrect. The correct answer is option {question.correct?.toUpperCase()}.</p>
                     {question.explanation && (
                       <p className="explanation">{question.explanation}</p>
                     )}
@@ -606,6 +806,7 @@ export default function QuizPage({ currentUser }){
                 className="btn btn-outline" 
                 onClick={handlePrevious}
                 disabled={currentQuestion === 0}
+                aria-label="Go to previous question"
               >
                 Previous
               </button>
@@ -613,19 +814,22 @@ export default function QuizPage({ currentUser }){
                 type="submit" 
                 className="btn btn-primary" 
                 disabled={!selected}
+                aria-label={submitted ? 'Move to next question' : 'Submit your answer'}
               >
-                Submit Answer
+                {submitted ? 'Next' : 'Submit Answer'}
               </button>
               {submitted && (
                 <button 
                   type="button" 
                   className="btn btn-primary" 
                   onClick={handleNext}
+                  aria-label={currentQuestion < totalQuestions - 1 ? 'Go to next question' : 'Finish quiz and view results'}
                 >
                   {currentQuestion < totalQuestions - 1 ? 'Next Question' : 'Finish Quiz'}
                 </button>
               )}
             </div>
+            </fieldset>
           </form>
         </div>
       </section>
@@ -634,7 +838,7 @@ export default function QuizPage({ currentUser }){
         <div className="question-list">
           <h4>Question Overview</h4>
           <div className="question-numbers">
-            {currentQuiz.questions.map((q, idx) => {
+            {currentQuiz?.questions?.map((q, idx) => {
               const status = idx === currentQuestion ? 'current' : 
                             answers[q.id] ? 'completed' : ''
               return (
@@ -642,9 +846,11 @@ export default function QuizPage({ currentUser }){
                   key={q.id} 
                   className={`q-number ${status}`}
                   onClick={() => {
+                    if (idx >= 0 && idx < totalQuestions) {
                     setCurrentQuestion(idx)
                     setSelected(answers[q.id] || '')
                     setSubmitted(false)
+                    }
                   }}
                 >
                   {idx + 1}

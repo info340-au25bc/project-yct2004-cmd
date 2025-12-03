@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import './GroupCreation.css'
+import { pushData } from '../utils/database'
 
 const sampleResources = [
   'Professor Messer Security+ Course',
@@ -58,6 +58,7 @@ export default function GroupCreation({ currentUser }){
   const [created, setCreated] = useState(null)
   const [errors, setErrors] = useState({})
   const [joinedGroups, setJoinedGroups] = useState([])
+  const [message, setMessage] = useState({ text: '', type: '' })
 
   function handleChange(e){
     const { name, value } = e.target
@@ -82,25 +83,52 @@ export default function GroupCreation({ currentUser }){
     return Object.keys(newErrors).length === 0
   }
 
-  function handleSubmit(e){
+  async function handleSubmit(e){
     e.preventDefault()
-    if (validateForm()) {
-      const newGroup = { ...form, id: Date.now(), members: 1 }
-      setCreated(newGroup)
-      setJoinedGroups([...joinedGroups, newGroup])
-      // Reset form
-      setForm({ 
-        name: '', 
-        description: '', 
-        resource: '', 
-        maxMembers: 8,
-        difficulty: '',
-        schedule: '',
-        timezone: ''
-      })
+    if (!validateForm()) return
+    
+    if (!currentUser) {
+      setErrors({ ...errors, general: 'Please sign in to create a group' })
+      return
+    }
+
+    const newGroup = {
+      ...form,
+      id: Date.now(),
+      members: 1,
+      creatorId: currentUser.uid,
+      creatorName: currentUser.displayName || currentUser.email || 'Anonymous',
+      createdAt: new Date().toISOString(),
+      memberIds: [currentUser.uid]
+    }
+
+    // Optimistic UI update
+    setCreated(newGroup)
+    setJoinedGroups([...joinedGroups, newGroup])
+    
+    // Reset form
+    setForm({ 
+      name: '', 
+      description: '', 
+      resource: '', 
+      maxMembers: 8,
+      difficulty: '',
+      schedule: '',
+      timezone: ''
+    })
+
+    // Save to Firebase
+    try {
+      await pushData('studyGroups', newGroup)
+      setMessage({ text: 'Group created successfully!', type: 'success' })
       setTimeout(() => {
         navigate('/forum')
       }, 2000)
+    } catch (error) {
+      setMessage({ text: 'Error creating group. Please try again.', type: 'error' })
+      // Remove from local state if Firebase save failed
+      setCreated(null)
+      setJoinedGroups(joinedGroups.filter(g => g.id !== newGroup.id))
     }
   }
 
@@ -120,9 +148,21 @@ export default function GroupCreation({ currentUser }){
   return (
     <main>
       <section className="hero-section">
-        <h2>Create a Study Group</h2>
+        <h1>Create a Study Group</h1>
         <p>Form a study group with fellow cybersecurity learners. Choose a resource to focus on and collaborate to master the material together!</p>
       </section>
+      
+      {message.text && (
+        <div className={`message ${message.type === 'error' ? 'error-message' : 'success-message'}`} style={{ margin: '1rem', padding: '1rem', borderRadius: '8px' }}>
+          {message.text}
+        </div>
+      )}
+      
+      {errors.general && (
+        <div className="error-message" style={{ margin: '1rem', padding: '1rem', borderRadius: '8px' }}>
+          {errors.general}
+        </div>
+      )}
 
       <section className="group-form-section">
         <h3>Group Creation Form</h3>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import './Forum.css'
+import { subscribeToData, pushData } from '../utils/database'
 
 export default function Forum({ currentUser }) {
   const [activeTab, setActiveTab] = useState('discussions')
@@ -45,15 +45,59 @@ export default function Forum({ currentUser }) {
 
   const [discussions, setDiscussions] = useState(defaultDiscussions)
   const [newDiscussion, setNewDiscussion] = useState({ title: '', content: '', category: '' })
+  const [loading, setLoading] = useState(true)
+  const [message, setMessage] = useState({ text: '', type: '' })
 
-  function handleCreateDiscussion(e) {
+  // Load discussions from Firebase
+  useEffect(() => {
+    setLoading(true)
+    const unsubscribe = subscribeToData('discussions', (data) => {
+      if (data) {
+        const discussionsArray = Object.values(data)
+          .filter(d => d !== null && d !== undefined)
+          .sort((a, b) => {
+            const dateA = new Date(a.createdAt || 0).getTime()
+            const dateB = new Date(b.createdAt || 0).getTime()
+            return dateB - dateA
+          })
+        
+        // Merge with default discussions (avoid duplicates)
+        const defaultIds = new Set([1, 2, 3])
+        const firebaseIds = new Set(discussionsArray.map(d => d.id))
+        const defaultsToAdd = defaultDiscussions.filter(d => !firebaseIds.has(d.id))
+        
+        setDiscussions([...discussionsArray, ...defaultsToAdd])
+      } else {
+        // No Firebase data, use defaults
+        setDiscussions(defaultDiscussions)
+      }
+      setLoading(false)
+    })
+
+    return () => {
+      if (unsubscribe) unsubscribe()
+    }
+  }, [])
+
+  async function handleCreateDiscussion(e) {
     e.preventDefault()
-    if (!newDiscussion.title.trim()) return
+    if (!newDiscussion.title.trim()) {
+      setMessage({ text: 'Please enter a discussion title', type: 'error' })
+      setTimeout(() => setMessage({ text: '', type: '' }), 3000)
+      return
+    }
+
+    if (!currentUser) {
+      setMessage({ text: 'Please sign in to create discussions', type: 'error' })
+      setTimeout(() => setMessage({ text: '', type: '' }), 3000)
+      return
+    }
 
     const discussion = {
       id: Date.now(),
       title: newDiscussion.title,
-      author: currentUser?.displayName || currentUser?.email || 'You',
+      author: currentUser.displayName || currentUser.email || 'Anonymous',
+      authorId: currentUser.uid,
       category: newDiscussion.category || 'General',
       replies: 0,
       views: 0,
@@ -63,30 +107,28 @@ export default function Forum({ currentUser }) {
       createdAt: new Date().toISOString()
     }
 
-    // Save to localStorage
-    const existingDiscussions = JSON.parse(localStorage.getItem('forumDiscussions') || '[]')
-    existingDiscussions.unshift(discussion)
-    localStorage.setItem('forumDiscussions', JSON.stringify(existingDiscussions))
-
+    // Optimistic UI update
     setDiscussions([discussion, ...discussions])
     setNewDiscussion({ title: '', content: '', category: '' })
-  }
+    setMessage({ text: 'Discussion created successfully!', type: 'success' })
+    setTimeout(() => setMessage({ text: '', type: '' }), 3000)
 
-  useEffect(() => {
-    // Load discussions from localStorage on mount and merge with defaults
-    const savedDiscussions = JSON.parse(localStorage.getItem('forumDiscussions') || '[]')
-    // Merge: saved discussions first, then defaults (avoid duplicates)
-    const defaultIds = new Set([1, 2, 3]) // Default discussion IDs
-    const newDiscussions = savedDiscussions.filter(d => !defaultIds.has(d.id))
-    setDiscussions([...newDiscussions, ...defaultDiscussions])
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+    // Save to Firebase
+    try {
+      await pushData('discussions', discussion)
+    } catch (error) {
+      setMessage({ text: 'Error saving discussion. Please try again.', type: 'error' })
+      setTimeout(() => setMessage({ text: '', type: '' }), 3000)
+      // Remove from local state if Firebase save failed
+      setDiscussions(prev => prev.filter(d => d.id !== discussion.id))
+    }
+  }
 
   return (
     <main className="forum-page">
-      <section className="forum-header">
+      <section className="forum-header" aria-labelledby="forum-heading">
         <div>
-          <h2>💬 Community Forum</h2>
+          <h1 id="forum-heading">💬 Community Forum</h1>
           <p>Connect with fellow learners, share knowledge, and form study groups</p>
         </div>
         <Link to="/groups" className="btn btn-primary">
@@ -117,6 +159,11 @@ export default function Forum({ currentUser }) {
 
       {activeTab === 'discussions' && (
         <div className="forum-content">
+          {message.text && (
+            <div className={`message ${message.type === 'error' ? 'error-message' : 'success-message'}`}>
+              {message.text}
+            </div>
+          )}
           <section className="create-discussion">
             <h3>Start a New Discussion</h3>
             <form onSubmit={handleCreateDiscussion} className="discussion-form">
@@ -159,8 +206,13 @@ export default function Forum({ currentUser }) {
 
           <section className="discussions-list">
             <h3>Recent Discussions</h3>
-            <div className="discussions-grid">
-              {discussions.map(discussion => (
+            {loading ? (
+              <div className="loading-state">
+                <p>Loading discussions...</p>
+              </div>
+            ) : (
+              <div className="discussions-grid">
+                {discussions.map(discussion => (
                 <div key={discussion.id} className="discussion-card">
                   <div className="discussion-header">
                     <h4>{discussion.title}</h4>
@@ -184,7 +236,8 @@ export default function Forum({ currentUser }) {
                   </Link>
                 </div>
               ))}
-            </div>
+              </div>
+            )}
           </section>
         </div>
       )}

@@ -13,7 +13,6 @@ import Ranking from './pages/Ranking'
 import TestQuestions from './pages/TestQuestions'
 import Forum from './pages/Forum'
 import DiscussionDetail from './pages/DiscussionDetail'
-import './App.css'
 
 // Protected Route Component
 function ProtectedRoute({ children, currentUser }) {
@@ -82,7 +81,13 @@ export default function App(){
 
   // Check Firebase configuration
   useEffect(() => {
-    setFirebaseReady(isFirebaseReady())
+    const ready = isFirebaseReady()
+    setFirebaseReady(ready)
+    if (ready) {
+      console.log('✅ Firebase is ready in App component')
+    } else {
+      console.warn('⚠️ Firebase is NOT ready in App component')
+    }
   }, [])
 
   // Subscribe to auth state changes

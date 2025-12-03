@@ -18,13 +18,53 @@ export default function TestQuestions({ currentUser }) {
   const [showForm, setShowForm] = useState(false)
   const [feedback, setFeedback] = useState({})
   const [message, setMessage] = useState({ text: '', type: '' })
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   // Load questions from Firebase
   useEffect(() => {
     const unsubscribe = subscribeToData('questions', (data) => {
       if (data) {
+        // Convert Firebase object to array and sort by creation date (newest first)
         const questionsArray = Object.values(data)
-        setQuestions(questionsArray)
+          .filter(q => q !== null && q !== undefined)
+          .sort((a, b) => {
+            // Sort by creation date, newest first
+            const dateA = new Date(a.createdAt || 0).getTime()
+            const dateB = new Date(b.createdAt || 0).getTime()
+            return dateB - dateA
+          })
+        
+        // Update questions from Firebase (will merge with any local additions)
+        setQuestions(prev => {
+          // Create a map of existing questions by id to preserve local additions
+          const existingMap = new Map()
+          
+          // First, add all existing local questions
+          prev.forEach(q => {
+            if (q && q.id) {
+              existingMap.set(q.id, q)
+            }
+          })
+          
+          // Then, add/update questions from Firebase (Firebase data takes precedence)
+          questionsArray.forEach(q => {
+            if (q && q.id) {
+              existingMap.set(q.id, q)
+            }
+          })
+          
+          // Convert back to array and sort
+          const merged = Array.from(existingMap.values()).sort((a, b) => {
+            const dateA = new Date(a.createdAt || 0).getTime()
+            const dateB = new Date(b.createdAt || 0).getTime()
+            return dateB - dateA
+          })
+          
+          return merged
+        })
+      } else {
+        // Only set empty if we don't have any local questions
+        setQuestions(prev => prev.length > 0 ? prev : [])
       }
       setLoading(false)
     })
@@ -32,7 +72,7 @@ export default function TestQuestions({ currentUser }) {
     return () => {
       if (unsubscribe) unsubscribe()
     }
-  }, [])
+  }, []) // Remove questions from dependency to avoid infinite loop
 
   function handleChange(e) {
     const { name, value } = e.target
@@ -41,24 +81,61 @@ export default function TestQuestions({ currentUser }) {
 
   async function handleSubmit(e) {
     e.preventDefault()
-    if (!formData.question || !formData.correctAnswer) {
-      setMessage({ text: 'Please fill in the question and select the correct answer', type: 'error' })
+    
+    // Prevent double submission
+    if (isSubmitting) {
+      return
+    }
+
+    // Validate all required fields
+    const errors = []
+    if (!formData.question?.trim()) errors.push('Question text is required')
+    if (!formData.category) errors.push('Category is required')
+    if (!formData.difficulty) errors.push('Difficulty level is required')
+    if (!formData.optionA?.trim()) errors.push('Option A is required')
+    if (!formData.optionB?.trim()) errors.push('Option B is required')
+    if (!formData.optionC?.trim()) errors.push('Option C is required')
+    if (!formData.optionD?.trim()) errors.push('Option D is required')
+    if (!formData.correctAnswer) errors.push('Correct answer must be selected')
+
+    if (errors.length > 0) {
+      setMessage({ text: errors.join('. '), type: 'error' })
+      setTimeout(() => setMessage({ text: '', type: '' }), 5000)
+      return
+    }
+
+    // Check if user is logged in
+    if (!currentUser) {
+      setMessage({ text: 'You must be logged in to create questions', type: 'error' })
       setTimeout(() => setMessage({ text: '', type: '' }), 3000)
       return
     }
 
+    setIsSubmitting(true)
+    setMessage({ text: 'Creating question...', type: 'info' })
+
     const newQuestion = {
       id: Date.now(),
-      ...formData,
-      author: currentUser?.displayName || currentUser?.email || 'Anonymous',
-      authorId: currentUser?.uid || 'anonymous',
+      question: formData.question.trim(),
+      optionA: formData.optionA.trim(),
+      optionB: formData.optionB.trim(),
+      optionC: formData.optionC.trim(),
+      optionD: formData.optionD.trim(),
+      correctAnswer: formData.correctAnswer,
+      explanation: formData.explanation?.trim() || '',
+      category: formData.category,
+      difficulty: formData.difficulty,
+      author: currentUser.displayName || currentUser.email || 'Anonymous',
+      authorId: currentUser.uid,
       createdAt: new Date().toISOString(),
       feedback: []
     }
 
+    // Add question to local state immediately for instant feedback
     try {
-      // Save to Firebase
-      await pushData('questions', newQuestion)
+      setQuestions(prev => [newQuestion, ...prev])
+      
+      // Reset form immediately
       setFormData({
         question: '',
         optionA: '',
@@ -70,13 +147,52 @@ export default function TestQuestions({ currentUser }) {
         category: '',
         difficulty: ''
       })
+      
+      // Close form
       setShowForm(false)
+      setIsSubmitting(false)
+      
+      // Show success message
       setMessage({ text: 'Question created successfully!', type: 'success' })
-      setTimeout(() => setMessage({ text: '', type: '' }), 3000)
+      setTimeout(() => setMessage({ text: '', type: '' }), 5000)
+      
+      // Scroll to questions list to show the new question
+      setTimeout(() => {
+        const questionsSection = document.querySelector('.questions-list-section')
+        if (questionsSection) {
+          questionsSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        }
+      }, 100)
+      
+      // Save to Firebase in the background (with timeout)
+      try {
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Firebase save timeout')), 10000)
+        )
+
+        const savePromise = pushData('questions', newQuestion)
+        const saveResult = await Promise.race([savePromise, timeoutPromise])
+        // saveResult may be a key/string or an object; try to extract a sensible identifier
+        const questionKey = saveResult && (saveResult.key || saveResult.name || saveResult)
+
+        if (questionKey) {
+          setQuestions(prev => prev.map(q =>
+            q.id === newQuestion.id ? { ...q, firebaseKey: questionKey } : q
+          ))
+        }
+      } catch (firebaseError) {
+        console.error('Error saving to Firebase (but question is shown locally):', firebaseError)
+        // Don't show error to user since question is already visible
+        // The subscription will eventually sync it
+      }
     } catch (error) {
       console.error('Error creating question:', error)
-      setMessage({ text: 'Error creating question. Please try again.', type: 'error' })
-      setTimeout(() => setMessage({ text: '', type: '' }), 3000)
+      setIsSubmitting(false)
+      setMessage({ 
+        text: `Error creating question: ${error.message || 'Please try again.'}`, 
+        type: 'error' 
+      })
+      setTimeout(() => setMessage({ text: '', type: '' }), 5000)
     }
   }
 
@@ -131,13 +247,21 @@ export default function TestQuestions({ currentUser }) {
   return (
     <main className="test-questions-page">
       {message.text && (
-        <div className={`message ${message.type === 'error' ? 'error-message' : 'success-message'}`}>
+        <div
+          className={`message ${
+            message.type === 'error' ? 'error-message' : 
+            message.type === 'info' ? 'info-message' : 
+            'success-message'
+          }`}
+          role="status"
+          aria-live="polite"
+        >
           {message.text}
         </div>
       )}
       <section className="questions-header">
         <div>
-          <h2>📝 Question Creator</h2>
+          <h1>📝 Question Creator</h1>
           <p>Create and share cybersecurity quiz questions with the community</p>
         </div>
         <button 
@@ -281,13 +405,31 @@ export default function TestQuestions({ currentUser }) {
             </div>
 
             <div className="form-actions">
-              <button type="submit" className="btn btn-primary">
-                Create Question
+              <button 
+                type="submit" 
+                className="btn btn-primary"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? 'Creating...' : 'Create Question'}
               </button>
               <button 
                 type="button" 
-                onClick={() => setShowForm(false)}
+                onClick={() => {
+                  setShowForm(false)
+                  setFormData({
+                    question: '',
+                    optionA: '',
+                    optionB: '',
+                    optionC: '',
+                    optionD: '',
+                    correctAnswer: '',
+                    explanation: '',
+                    category: '',
+                    difficulty: ''
+                  })
+                }}
                 className="btn btn-outline"
+                disabled={isSubmitting}
               >
                 Cancel
               </button>
@@ -297,7 +439,7 @@ export default function TestQuestions({ currentUser }) {
       )}
 
       <section className="questions-list-section">
-        <h3>Community Questions</h3>
+        <h2>Community Questions</h2>
 
         {questions.length === 0 ? (
           <div className="empty-state">

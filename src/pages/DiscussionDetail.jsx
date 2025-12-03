@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { subscribeToData, pushData, writeData } from '../utils/database'
-import './DiscussionDetail.css'
 
 export default function DiscussionDetail({ currentUser }) {
   const { id } = useParams()
@@ -53,106 +52,50 @@ export default function DiscussionDetail({ currentUser }) {
       }
     ]
 
-    // First, check localStorage (since Forum uses localStorage)
-    const savedDiscussions = JSON.parse(localStorage.getItem('forumDiscussions') || '[]')
-    const foundLocalDiscussion = savedDiscussions.find(d => d.id === parseInt(id))
-    
-    if (foundLocalDiscussion) {
-      setDiscussion(foundLocalDiscussion)
-      setLoading(false)
-    } else {
-      // Then check Firebase
-      const unsubscribeDiscussions = subscribeToData('discussions', (data) => {
-        if (data) {
-          const discussionsArray = Object.values(data)
-          const foundDiscussion = discussionsArray.find(d => d.id === parseInt(id))
-          if (foundDiscussion) {
-            setDiscussion(foundDiscussion)
-            setLoading(false)
-          } else {
-            // Finally check default discussions
-            const defaultDiscussion = defaultDiscussions.find(d => d.id === parseInt(id))
-            if (defaultDiscussion) {
-              setDiscussion(defaultDiscussion)
-            }
-            setLoading(false)
-          }
+    // Load discussion from Firebase
+    const unsubscribeDiscussions = subscribeToData('discussions', (data) => {
+      if (data) {
+        const discussionsArray = Object.values(data)
+        const foundDiscussion = discussionsArray.find(d => d.id === parseInt(id))
+        if (foundDiscussion) {
+          setDiscussion(foundDiscussion)
+          setLoading(false)
         } else {
-          // No Firebase data, check defaults
+          // Check default discussions if not in Firebase
           const defaultDiscussion = defaultDiscussions.find(d => d.id === parseInt(id))
           if (defaultDiscussion) {
             setDiscussion(defaultDiscussion)
           }
           setLoading(false)
         }
-      })
-      
-      return () => {
-        if (unsubscribeDiscussions) unsubscribeDiscussions()
+      } else {
+        // No Firebase data, check defaults
+        const defaultDiscussion = defaultDiscussions.find(d => d.id === parseInt(id))
+        if (defaultDiscussion) {
+          setDiscussion(defaultDiscussion)
+        }
+        setLoading(false)
       }
-    }
+    })
 
-    // Load replies from localStorage first, then Firebase
-    const savedReplies = JSON.parse(localStorage.getItem(`discussionReplies_${id}`) || '[]')
-    
-    // For default discussions, add some sample replies if none exist
-    const defaultReplies = {
-      1: [
-        {
-          id: 101,
-          author: 'John Smith',
-          content: 'I highly recommend Professor Messer\'s free Security+ course on YouTube. It covers all the objectives and is perfect for beginners.',
-          timestamp: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
-          avatar: 'https://via.placeholder.com/40'
-        },
-        {
-          id: 102,
-          author: 'Emily Davis',
-          content: 'The CompTIA Security+ Study Guide by Darril Gibson is excellent. I used it along with practice tests from ExamCompass.',
-          timestamp: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
-          avatar: 'https://via.placeholder.com/40'
-        }
-      ],
-      2: [
-        {
-          id: 201,
-          author: 'Michael Brown',
-          content: 'I passed CISSP after 6 months of study. The key is understanding the 8 domains thoroughly. I used the Official Study Guide and practice questions.',
-          timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-          avatar: 'https://via.placeholder.com/40'
-        }
-      ],
-      3: [
-        {
-          id: 301,
-          author: 'David Wilson',
-          content: 'Network security fundamentals include understanding firewalls, IDS/IPS, VPNs, and network segmentation. Start with the OSI model and TCP/IP protocols.',
-          timestamp: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(),
-          avatar: 'https://via.placeholder.com/40'
-        }
-      ]
-    }
-    
-    if (savedReplies.length > 0) {
-      setReplies(savedReplies)
-    } else if (defaultReplies[parseInt(id)]) {
-      // Use default replies for default discussions if no saved replies
-      setReplies(defaultReplies[parseInt(id)])
-    }
-
-    // Also subscribe to Firebase replies
+    // Load replies from Firebase
     const unsubscribeReplies = subscribeToData(`discussionReplies/${id}`, (data) => {
       if (data) {
         const repliesArray = Object.values(data)
+          .filter(r => r !== null && r !== undefined)
+          .sort((a, b) => {
+            const dateA = new Date(a.timestamp || 0).getTime()
+            const dateB = new Date(b.timestamp || 0).getTime()
+            return dateA - dateB
+          })
         setReplies(repliesArray)
-        // Also save to localStorage for consistency
-        localStorage.setItem(`discussionReplies_${id}`, JSON.stringify(repliesArray))
-      } else if (savedReplies.length === 0 && !defaultReplies[parseInt(id)]) {
+      } else {
         setReplies([])
       }
     })
 
     return () => {
+      if (unsubscribeDiscussions) unsubscribeDiscussions()
       if (unsubscribeReplies) unsubscribeReplies()
     }
   }, [id])
@@ -187,10 +130,7 @@ export default function DiscussionDetail({ currentUser }) {
       // Save reply to Firebase
       await pushData(`discussionReplies/${id}`, reply)
       
-      // Also save to localStorage for consistency
-      localStorage.setItem(`discussionReplies_${id}`, JSON.stringify(updatedReplies))
-      
-      // Update discussion reply count
+      // Update discussion reply count in Firebase
       if (discussion) {
         const updatedDiscussion = {
           ...discussion,
@@ -199,28 +139,20 @@ export default function DiscussionDetail({ currentUser }) {
         }
         setDiscussion(updatedDiscussion)
         
-        // Update in localStorage if discussion is from localStorage
-        const savedDiscussions = JSON.parse(localStorage.getItem('forumDiscussions') || '[]')
-        const discussionIndex = savedDiscussions.findIndex(d => d.id === parseInt(id))
-        if (discussionIndex !== -1) {
-          savedDiscussions[discussionIndex] = updatedDiscussion
-          localStorage.setItem('forumDiscussions', JSON.stringify(savedDiscussions))
-        } else {
-          // Try to update in Firebase
-          try {
-            const unsubscribe = subscribeToData('discussions', async (data) => {
-              if (data) {
-                const discussionsArray = Object.entries(data)
-                const foundEntry = discussionsArray.find(([key, d]) => d.id === parseInt(id))
-                if (foundEntry) {
-                  await writeData(`discussions/${foundEntry[0]}`, updatedDiscussion)
-                }
+        // Update in Firebase
+        try {
+          const unsubscribe = subscribeToData('discussions', async (data) => {
+            if (data) {
+              const discussionsArray = Object.entries(data)
+              const foundEntry = discussionsArray.find(([key, d]) => d.id === parseInt(id))
+              if (foundEntry) {
+                await writeData(`discussions/${foundEntry[0]}`, updatedDiscussion)
               }
-              if (unsubscribe) unsubscribe()
-            })
-          } catch (error) {
-            // Firebase update failed, but that's okay
-          }
+            }
+            if (unsubscribe) unsubscribe()
+          })
+        } catch (error) {
+          // Firebase update failed, but that's okay - reply is saved
         }
       }
       
@@ -228,10 +160,10 @@ export default function DiscussionDetail({ currentUser }) {
       setMessage({ text: 'Reply posted successfully!', type: 'success' })
       setTimeout(() => setMessage({ text: '', type: '' }), 3000)
     } catch (error) {
-      // If Firebase fails, still keep the reply in localStorage
-      localStorage.setItem(`discussionReplies_${id}`, JSON.stringify(updatedReplies))
-      setMessage({ text: 'Reply saved locally. Some features may be limited.', type: 'info' })
+      setMessage({ text: 'Error posting reply. Please try again.', type: 'error' })
       setTimeout(() => setMessage({ text: '', type: '' }), 3000)
+      // Remove from local state if Firebase save failed
+      setReplies(replies)
     }
   }
 
