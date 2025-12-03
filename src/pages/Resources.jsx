@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import CommentSection from '../components/CommentSection'
 
 const resources = [
   {
@@ -68,43 +69,12 @@ const categories = [
   { icon: '📰', title: 'Articles & Blogs', description: 'Latest insights and industry news', count: 35 }
 ]
 
-const certifications = [
-  {
-    name: 'CompTIA Security+',
-    logo: '🔒',
-    description: 'Entry-level cybersecurity certification covering network security, compliance, and risk management.',
-    resources: [
-      { icon: '🎥', text: 'Professor Messer Course' },
-      { icon: '📖', text: 'Official Study Guide' },
-      { icon: '🔧', text: 'Practice Tests' }
-    ]
-  },
-  {
-    name: 'CISSP',
-    logo: '🏆',
-    description: 'Advanced certification for experienced security professionals covering 8 security domains.',
-    resources: [
-      { icon: '🎥', text: 'CISSP Training Videos' },
-      { icon: '📖', text: 'CISSP Study Guide' },
-      { icon: '🔧', text: 'Domain Practice Tests' }
-    ]
-  },
-  {
-    name: 'CEH',
-    logo: '⚔️',
-    description: 'Ethical Hacking certification focusing on penetration testing and vulnerability assessment.',
-    resources: [
-      { icon: '🎥', text: 'Ethical Hacking Course' },
-      { icon: '📖', text: 'CEH Study Guide' },
-      { icon: '🔧', text: 'Lab Environment' }
-    ]
-  }
-]
 
-export default function Resources(){
+export default function Resources({ currentUser }){
   const [searchQuery, setSearchQuery] = useState('')
   const [resourceType, setResourceType] = useState('')
   const [difficulty, setDifficulty] = useState('')
+  const [message, setMessage] = useState({ text: '', type: '' })
 
   const filteredResources = resources.filter(resource => {
     const matchesSearch = resource.title.toLowerCase().includes(searchQuery.toLowerCase())
@@ -113,10 +83,49 @@ export default function Resources(){
     return matchesSearch && matchesType && matchesDifficulty
   })
 
+  function handleBrowseCategory(categoryTitle) {
+    // Filter resources by category type
+    const categoryMap = {
+      'Video Courses': 'Video Course',
+      'Books & eBooks': 'Book',
+      'Tools & Software': 'Tool',
+      'Articles & Blogs': 'Article'
+    }
+    
+    const type = categoryMap[categoryTitle] || ''
+    setResourceType(type)
+    setSearchQuery('')
+    setDifficulty('')
+    
+    // Show feedback message
+    setMessage({ 
+      text: `Showing ${categoryTitle.toLowerCase()}. Scroll down to see filtered resources.`, 
+      type: 'info' 
+    })
+    setTimeout(() => setMessage({ text: '', type: '' }), 3000)
+    
+    // Scroll to resources section
+    setTimeout(() => {
+      const resourcesSection = document.querySelector('.featured-resources')
+      if (resourcesSection) {
+        resourcesSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }
+    }, 100)
+  }
+
   return (
     <main>
-      <section className="resources-header">
-        <h2>📚 Cybersecurity Learning Resources</h2>
+      {message.text && (
+        <div 
+          className={`message ${message.type === 'error' ? 'error-message' : message.type === 'info' ? 'info-message' : 'success-message'}`}
+          role="alert"
+          aria-live="polite"
+        >
+          {message.text}
+        </div>
+      )}
+      <section className="resources-header" aria-labelledby="resources-heading">
+        <h1 id="resources-heading">📚 Cybersecurity Learning Resources</h1>
         <p>Expert-curated materials to accelerate your cybersecurity journey</p>
         <div className="resource-search">
           <form className="resource-search-form" onSubmit={(e) => e.preventDefault()}>
@@ -160,16 +169,16 @@ export default function Resources(){
                 <option value="advanced">Advanced</option>
               </select>
             </div>
-            <button type="submit" className="btn btn-search">Search</button>
+            <button type="submit" className="btn btn-search" aria-label="Search for resources">Search</button>
           </form>
         </div>
       </section>
 
-      <section className="featured-resources">
-        <h3>🌟 Featured Resources</h3>
-        <div className="resource-grid">
+      <section className="featured-resources" aria-labelledby="featured-heading">
+        <h2 id="featured-heading">🌟 Featured Resources</h2>
+        <div className="resource-grid" role="list" aria-label="Featured resources">
           {filteredResources.map(resource => (
-            <article key={resource.id} className={`resource-card ${resource.featured ? 'featured' : ''}`}>
+            <article key={resource.id} className={`resource-card ${resource.featured ? 'featured' : ''}`} role="listitem">
               <div className="resource-content">
                 {resource.featured && <div className="resource-badge">Most Popular</div>}
                 <div className="resource-type">{resource.type}</div>
@@ -183,10 +192,9 @@ export default function Resources(){
                   <span className={`level ${resource.difficulty}`}>{resource.difficulty}</span>
                 </div>
                 <div className="resource-actions">
-                  <a href={resource.url} target="_blank" rel="noreferrer" className="btn btn-primary">
+                  <a href={resource.url} target="_blank" rel="noreferrer" className="btn btn-primary" aria-label={`${resource.type === 'Tool' ? 'Access' : resource.type === 'Book' ? 'Get' : 'Watch'} ${resource.title}`}>
                     {resource.type === 'Tool' ? 'Access Tool' : resource.type === 'Book' ? 'Get Book' : 'Watch Now'}
                   </a>
-                  <button className="btn btn-outline">Save</button>
                 </div>
               </div>
             </article>
@@ -194,8 +202,8 @@ export default function Resources(){
         </div>
       </section>
 
-      <section className="resource-categories">
-        <h3>Browse by Category</h3>
+      <section className="resource-categories" aria-labelledby="categories-heading">
+        <h2 id="categories-heading">Browse by Category</h2>
         <div className="categories-grid">
           {categories.map((category, idx) => (
             <div key={idx} className="category-card">
@@ -203,35 +211,23 @@ export default function Resources(){
               <h4>{category.title}</h4>
               <p>{category.description}</p>
               <div className="category-count">{category.count} resources</div>
-              <button className="btn btn-outline">Browse {category.title}</button>
+              <button 
+                type="button"
+                className="btn btn-outline"
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  handleBrowseCategory(category.title)
+                }}
+              >
+                Browse {category.title}
+              </button>
             </div>
           ))}
         </div>
       </section>
 
-      <section className="certification-paths">
-        <h3>Certification Learning Paths</h3>
-        <div className="cert-grid">
-          {certifications.map((cert, idx) => (
-            <div key={idx} className="cert-card">
-              <div className="cert-header">
-                <span className="cert-logo" style={{ fontSize: '2rem' }}>{cert.logo}</span>
-                <h4>{cert.name}</h4>
-              </div>
-              <p>{cert.description}</p>
-              <div className="cert-resources">
-                {cert.resources.map((resource, rIdx) => (
-                  <div key={rIdx} className="resource-item">
-                    <span className="resource-icon">{resource.icon}</span>
-                    <span>{resource.text}</span>
-                  </div>
-                ))}
-              </div>
-              <button className="btn btn-primary">Start Learning</button>
-            </div>
-          ))}
-        </div>
-      </section>
+      <CommentSection itemId="resources-page" itemType="resource" currentUser={currentUser} />
     </main>
   )
 }

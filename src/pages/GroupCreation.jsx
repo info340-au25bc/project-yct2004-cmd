@@ -1,4 +1,6 @@
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { pushData } from '../utils/database'
 
 const sampleResources = [
   'Professor Messer Security+ Course',
@@ -42,7 +44,8 @@ const existingGroups = [
   }
 ]
 
-export default function GroupCreation(){
+export default function GroupCreation({ currentUser }){
+  const navigate = useNavigate()
   const [form, setForm] = useState({ 
     name: '', 
     description: '', 
@@ -54,6 +57,8 @@ export default function GroupCreation(){
   })
   const [created, setCreated] = useState(null)
   const [errors, setErrors] = useState({})
+  const [joinedGroups, setJoinedGroups] = useState([])
+  const [message, setMessage] = useState({ text: '', type: '' })
 
   function handleChange(e){
     const { name, value } = e.target
@@ -78,32 +83,89 @@ export default function GroupCreation(){
     return Object.keys(newErrors).length === 0
   }
 
-  function handleSubmit(e){
+  async function handleSubmit(e){
     e.preventDefault()
-    if (validateForm()) {
-      setCreated({ ...form, id: Date.now() })
-      // Reset form
-      setForm({ 
-        name: '', 
-        description: '', 
-        resource: '', 
-        maxMembers: 8,
-        difficulty: '',
-        schedule: '',
-        timezone: ''
-      })
+    if (!validateForm()) return
+    
+    if (!currentUser) {
+      setErrors({ ...errors, general: 'Please sign in to create a group' })
+      return
+    }
+
+    const newGroup = {
+      ...form,
+      id: Date.now(),
+      members: 1,
+      creatorId: currentUser.uid,
+      creatorName: currentUser.displayName || currentUser.email || 'Anonymous',
+      createdAt: new Date().toISOString(),
+      memberIds: [currentUser.uid]
+    }
+
+    // Optimistic UI update
+    setCreated(newGroup)
+    setJoinedGroups([...joinedGroups, newGroup])
+    
+    // Reset form
+    setForm({ 
+      name: '', 
+      description: '', 
+      resource: '', 
+      maxMembers: 8,
+      difficulty: '',
+      schedule: '',
+      timezone: ''
+    })
+
+    // Save to Firebase
+    try {
+      await pushData('studyGroups', newGroup)
+      setMessage({ text: 'Group created successfully!', type: 'success' })
+      setTimeout(() => {
+        navigate('/forum')
+      }, 2000)
+    } catch (error) {
+      setMessage({ text: 'Error creating group. Please try again.', type: 'error' })
+      // Remove from local state if Firebase save failed
+      setCreated(null)
+      setJoinedGroups(joinedGroups.filter(g => g.id !== newGroup.id))
+    }
+  }
+
+  const [joinMessage, setJoinMessage] = useState('')
+
+  function handleJoinGroup(groupId) {
+    const group = existingGroups.find(g => g.id === groupId)
+    if (group && !joinedGroups.find(g => g.id === groupId)) {
+      setJoinedGroups([...joinedGroups, { ...group, joined: true }])
+      setJoinMessage(`You've joined ${group.name}! Redirecting to Forum...`)
+      setTimeout(() => {
+        navigate('/forum')
+      }, 1500)
     }
   }
 
   return (
     <main>
       <section className="hero-section">
-        <h2>Create a Study Group</h2>
+        <h1>Create a Study Group</h1>
         <p>Form a study group with fellow cybersecurity learners. Choose a resource to focus on and collaborate to master the material together!</p>
       </section>
+      
+      {message.text && (
+        <div className={`message ${message.type === 'error' ? 'error-message' : 'success-message'}`} style={{ margin: '1rem', padding: '1rem', borderRadius: '8px' }}>
+          {message.text}
+        </div>
+      )}
+      
+      {errors.general && (
+        <div className="error-message" style={{ margin: '1rem', padding: '1rem', borderRadius: '8px' }}>
+          {errors.general}
+        </div>
+      )}
 
       <section className="group-form-section">
-        <h2>Group Creation Form</h2>
+        <h3>Group Creation Form</h3>
         <form onSubmit={handleSubmit} aria-label="Create study group">
           <div className="form-group">
             <label htmlFor="group-name">Group Name:</label>
@@ -241,10 +303,18 @@ export default function GroupCreation(){
               <p><strong>Timezone:</strong> {created.timezone}</p>
               {created.description && <p><strong>Description:</strong> {created.description}</p>}
             </div>
+            <p style={{ marginTop: '1rem', color: '#2563eb' }}>
+              Redirecting to Forum to start chatting...
+            </p>
           </div>
         )}
       </section>
 
+      {joinMessage && (
+        <div className="success-message">
+          {joinMessage}
+        </div>
+      )}
       <section className="existing-groups">
         <h2>Join Existing Groups</h2>
         <div className="groups-grid">
@@ -256,7 +326,14 @@ export default function GroupCreation(){
                 <span className="members">{group.members}/{group.maxMembers} members</span>
                 <span className={`difficulty ${group.difficulty}`}>{group.difficulty}</span>
               </div>
-              <button type="button" className="btn btn-outline">Join Group</button>
+              <button 
+                type="button" 
+                className="btn btn-outline"
+                onClick={() => handleJoinGroup(group.id)}
+                disabled={joinedGroups.find(g => g.id === group.id)}
+              >
+                {joinedGroups.find(g => g.id === group.id) ? 'Joined ✓' : 'Join Group'}
+              </button>
             </div>
           ))}
         </div>

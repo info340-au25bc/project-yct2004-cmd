@@ -1,9 +1,15 @@
 import React from 'react'
 import { Link, NavLink } from 'react-router-dom'
 
-export default function Header() {
+export default function Header({ currentUser, firebaseReady, onLogout }) {
   const makeNavClass = ({ isActive }) =>
     isActive ? 'nav-link active' : 'nav-link'
+
+  async function handleLogout() {
+    if (onLogout) {
+      await onLogout()
+    }
+  }
 
   return (
     <header>
@@ -43,13 +49,47 @@ export default function Header() {
                 Proposal
               </NavLink>
             </li>
-            <li>
-              <NavLink to="/groups" className={makeNavClass}>
-                Groups
-              </NavLink>
-            </li>
+            {currentUser && (
+              <>
+                <li>
+                  <NavLink to="/forum" className={makeNavClass}>
+                    Forum
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink to="/groups" className={makeNavClass}>
+                    Groups
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink to="/testquestions" className={makeNavClass}>
+                    Create Questions
+                  </NavLink>
+                </li>
+              </>
+            )}
           </ul>
         </nav>
+
+        <div className="user-section">
+          {currentUser ? (
+            <div className="user-info">
+              <img 
+                src={currentUser.photoURL || 'https://via.placeholder.com/32'} 
+                alt={currentUser.displayName || 'User'} 
+                className="user-avatar"
+              />
+              <span className="user-name">{currentUser.displayName || currentUser.email}</span>
+              <button onClick={handleLogout} className="btn btn-logout">
+                Logout
+              </button>
+            </div>
+          ) : (
+            <Link to="/login" className="btn btn-primary">
+              Sign In
+            </Link>
+          )}
+        </div>
       </div>
     </header>
   )
