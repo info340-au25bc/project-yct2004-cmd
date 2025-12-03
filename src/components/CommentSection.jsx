@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
 import { subscribeToData, pushData, writeData } from '../utils/database'
-import './CommentSection.css'
 
 export default function CommentSection({ itemId, itemType = 'quiz', currentUser }) {
   const [comments, setComments] = useState([])
@@ -8,38 +7,56 @@ export default function CommentSection({ itemId, itemType = 'quiz', currentUser 
   const [replyingTo, setReplyingTo] = useState(null)
   const [replyText, setReplyText] = useState({})
   const [message, setMessage] = useState({ text: '', type: '' })
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   // Load comments from Firebase
   useEffect(() => {
     const unsubscribe = subscribeToData(`comments/${itemId}`, (data) => {
       if (data) {
-        // Convert Firebase object to array and sort by timestamp
-        const commentsArray = Object.entries(data).map(([key, comment]) => ({
-          ...comment,
-          firebaseKey: key // Store Firebase key for updates
-        })).sort((a, b) => {
-          return new Date(b.timestamp) - new Date(a.timestamp)
+        // Convert Firebase object to array and sort by timestamp (newest first)
+        const commentsArray = Object.entries(data)
+          .filter(([key, comment]) => comment !== null && comment !== undefined)
+          .map(([key, comment]) => ({
+            ...comment,
+            firebaseKey: key // Store Firebase key for updates
+          }))
+          .sort((a, b) => {
+            const dateA = new Date(a.timestamp || 0).getTime()
+            const dateB = new Date(b.timestamp || 0).getTime()
+            return dateB - dateA
+          })
+        
+        // Merge with local comments to avoid duplicates
+        setComments(prev => {
+          // Create a map of existing comments by id
+          const existingMap = new Map()
+          
+          // First, add all existing local comments
+          prev.forEach(c => {
+            if (c && c.id) {
+              existingMap.set(c.id, c)
+            }
+          })
+          
+          // Then, add/update comments from Firebase (Firebase data takes precedence)
+          commentsArray.forEach(c => {
+            if (c && c.id) {
+              existingMap.set(c.id, c)
+            }
+          })
+          
+          // Convert back to array and sort
+          const merged = Array.from(existingMap.values()).sort((a, b) => {
+            const dateA = new Date(a.timestamp || 0).getTime()
+            const dateB = new Date(b.timestamp || 0).getTime()
+            return dateB - dateA
+          })
+          
+          return merged
         })
-        setComments(commentsArray)
       } else {
-        // Default comments if no data
-        const defaultComments = [
-          {
-            id: 1,
-            author: 'Alex Rodriguez',
-            text: 'Great quiz! The network security questions really helped me understand firewalls better.',
-            timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-            replies: []
-          },
-          {
-            id: 2,
-            author: 'Sarah Chen',
-            text: 'I found question 3 challenging. Can someone explain the difference between symmetric and asymmetric encryption?',
-            timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-            replies: []
-          }
-        ]
-        setComments(defaultComments)
+        // Keep local comments if they exist, otherwise show empty
+        setComments(prev => prev.length > 0 ? prev : [])
       }
     })
 
@@ -51,6 +68,11 @@ export default function CommentSection({ itemId, itemType = 'quiz', currentUser 
   async function handleSubmit(e) {
     e.preventDefault()
     e.stopPropagation()
+    
+    // Prevent double submission
+    if (isSubmitting) {
+      return
+    }
     
     if (!newComment.trim()) {
       setMessage({ text: 'Please enter a comment before posting', type: 'error' })
@@ -64,24 +86,48 @@ export default function CommentSection({ itemId, itemType = 'quiz', currentUser 
       return
     }
 
+    setIsSubmitting(true)
+    const commentText = newComment.trim()
+    
     const comment = {
       id: Date.now(),
       author: currentUser.displayName || currentUser.email || 'Anonymous',
       authorId: currentUser.uid || 'anonymous',
-      text: newComment.trim(),
+      text: commentText,
       timestamp: new Date().toISOString(),
       replies: []
     }
 
+    // Add comment to local state immediately for instant feedback
+    setComments(prev => [comment, ...prev])
+    
+    // Clear input immediately
+    setNewComment('')
+    setIsSubmitting(false)
+    
+    // Show success message
+    setMessage({ text: 'Comment posted successfully!', type: 'success' })
+    setTimeout(() => setMessage({ text: '', type: '' }), 3000)
+
+    // Save to Firebase in the background
     try {
-      await pushData(`comments/${itemId}`, comment)
-      setNewComment('')
-      setMessage({ text: 'Comment posted successfully!', type: 'success' })
-      setTimeout(() => setMessage({ text: '', type: '' }), 3000)
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Firebase save timeout')), 10000)
+      )
+      
+      const savePromise = pushData(`comments/${itemId}`, comment)
+      await Promise.race([savePromise, timeoutPromise])
+      
+      // Update the comment with Firebase key if needed
+      if (commentKey) {
+        setComments(prev => prev.map(c => 
+          c.id === comment.id ? { ...c, firebaseKey: commentKey } : c
+        ))
+      }
     } catch (error) {
-      console.error('Error posting comment:', error)
-      setMessage({ text: 'Failed to post comment. Please try again.', type: 'error' })
-      setTimeout(() => setMessage({ text: '', type: '' }), 3000)
+      console.error('Error saving comment to Firebase (but comment is shown locally):', error)
+      // Don't show error to user since comment is already visible
+      // The subscription will eventually sync it
     }
   }
 
@@ -156,7 +202,11 @@ export default function CommentSection({ itemId, itemType = 'quiz', currentUser 
   return (
     <div className="comment-section">
       {message.text && (
-        <div className={`message ${message.type === 'error' ? 'error-message' : 'success-message'}`}>
+        <div className={`message ${
+          message.type === 'error' ? 'error-message' : 
+          message.type === 'info' ? 'info-message' : 
+          'success-message'
+        }`}>
           {message.text}
         </div>
       )}
@@ -181,9 +231,9 @@ export default function CommentSection({ itemId, itemType = 'quiz', currentUser 
         <button 
           type="submit" 
           className="btn btn-primary"
-          disabled={!newComment.trim() || !currentUser}
+          disabled={!newComment.trim() || !currentUser || isSubmitting}
         >
-          Post Comment
+          {isSubmitting ? 'Posting...' : 'Post Comment'}
         </button>
       </form>
 

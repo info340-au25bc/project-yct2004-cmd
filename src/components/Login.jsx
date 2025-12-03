@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { signInWithGoogle } from '../utils/auth'
-import './Login.css'
 
 export default function Login({ currentUser, firebaseReady, onSignIn }) {
   const [error, setError] = useState('')

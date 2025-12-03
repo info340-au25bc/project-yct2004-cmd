@@ -261,7 +261,7 @@ export default function TestQuestions({ currentUser }) {
       )}
       <section className="questions-header">
         <div>
-          <h2>📝 Question Creator</h2>
+          <h1>📝 Question Creator</h1>
           <p>Create and share cybersecurity quiz questions with the community</p>
         </div>
         <button 
@@ -439,7 +439,7 @@ export default function TestQuestions({ currentUser }) {
       )}
 
       <section className="questions-list-section">
-        <h3>Community Questions</h3>
+        <h2>Community Questions</h2>
 
         {questions.length === 0 ? (
           <div className="empty-state">

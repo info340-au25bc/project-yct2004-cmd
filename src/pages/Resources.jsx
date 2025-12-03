@@ -1,6 +1,4 @@
-import React, { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { subscribeToData, pushData, writeData } from '../utils/database'
+import React, { useState } from 'react'
 import CommentSection from '../components/CommentSection'
 
 const resources = [
@@ -71,62 +69,12 @@ const categories = [
   { icon: '📰', title: 'Articles & Blogs', description: 'Latest insights and industry news', count: 35 }
 ]
 
-const certifications = [
-  {
-    name: 'CompTIA Security+',
-    logo: '🔒',
-    description: 'Entry-level cybersecurity certification covering network security, compliance, and risk management.',
-    resources: [
-      { icon: '🎥', text: 'Professor Messer Course' },
-      { icon: '📖', text: 'Official Study Guide' },
-      { icon: '🔧', text: 'Practice Tests' }
-    ]
-  },
-  {
-    name: 'CISSP',
-    logo: '🏆',
-    description: 'Advanced certification for experienced security professionals covering 8 security domains.',
-    resources: [
-      { icon: '🎥', text: 'CISSP Training Videos' },
-      { icon: '📖', text: 'CISSP Study Guide' },
-      { icon: '🔧', text: 'Domain Practice Tests' }
-    ]
-  },
-  {
-    name: 'CEH',
-    logo: '⚔️',
-    description: 'Ethical Hacking certification focusing on penetration testing and vulnerability assessment.',
-    resources: [
-      { icon: '🎥', text: 'Ethical Hacking Course' },
-      { icon: '📖', text: 'CEH Study Guide' },
-      { icon: '🔧', text: 'Lab Environment' }
-    ]
-  }
-]
 
 export default function Resources({ currentUser }){
-  const navigate = useNavigate()
   const [searchQuery, setSearchQuery] = useState('')
   const [resourceType, setResourceType] = useState('')
   const [difficulty, setDifficulty] = useState('')
-  const [savedResources, setSavedResources] = useState([])
   const [message, setMessage] = useState({ text: '', type: '' })
-
-  // Load saved resources from Firebase
-  useEffect(() => {
-    if (!currentUser) return
-
-    const userId = currentUser.uid
-    const unsubscribe = subscribeToData(`users/${userId}/savedResources`, (data) => {
-      if (data) {
-        setSavedResources(data.resourceIds || [])
-      }
-    })
-
-    return () => {
-      if (unsubscribe) unsubscribe()
-    }
-  }, [currentUser])
 
   const filteredResources = resources.filter(resource => {
     const matchesSearch = resource.title.toLowerCase().includes(searchQuery.toLowerCase())
@@ -134,39 +82,6 @@ export default function Resources({ currentUser }){
     const matchesDifficulty = difficulty ? resource.difficulty === difficulty : true
     return matchesSearch && matchesType && matchesDifficulty
   })
-
-  async function handleSaveResource(resourceId) {
-    if (!currentUser) {
-      setMessage({ text: 'Please sign in to save resources', type: 'error' })
-      setTimeout(() => setMessage({ text: '', type: '' }), 3000)
-      return
-    }
-
-    const userId = currentUser.uid
-    const isSaved = savedResources.includes(resourceId)
-    
-    let updatedSavedResources
-    if (isSaved) {
-      updatedSavedResources = savedResources.filter(id => id !== resourceId)
-      setMessage({ text: 'Resource removed from saved list', type: 'success' })
-    } else {
-      updatedSavedResources = [...savedResources, resourceId]
-      setMessage({ text: 'Resource saved successfully!', type: 'success' })
-    }
-
-    setSavedResources(updatedSavedResources)
-
-    try {
-      await writeData(`users/${userId}/savedResources`, {
-        resourceIds: updatedSavedResources
-      })
-    } catch (error) {
-      console.error('Error saving resource:', error)
-      setMessage({ text: 'Error saving resource. Please try again.', type: 'error' })
-    }
-
-    setTimeout(() => setMessage({ text: '', type: '' }), 3000)
-  }
 
   function handleBrowseCategory(categoryTitle) {
     // Filter resources by category type
@@ -182,37 +97,35 @@ export default function Resources({ currentUser }){
     setSearchQuery('')
     setDifficulty('')
     
+    // Show feedback message
+    setMessage({ 
+      text: `Showing ${categoryTitle.toLowerCase()}. Scroll down to see filtered resources.`, 
+      type: 'info' 
+    })
+    setTimeout(() => setMessage({ text: '', type: '' }), 3000)
+    
     // Scroll to resources section
     setTimeout(() => {
       const resourcesSection = document.querySelector('.featured-resources')
       if (resourcesSection) {
-        resourcesSection.scrollIntoView({ behavior: 'smooth' })
+        resourcesSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
       }
     }, 100)
-  }
-
-  function handleStartLearning(certName) {
-    // Navigate to quiz page or filter by certification
-    if (certName === 'CompTIA Security+') {
-      navigate('/quiz/network-security')
-    } else if (certName === 'CISSP') {
-      navigate('/quiz/risk-management')
-    } else if (certName === 'CEH') {
-      navigate('/quiz/incident-response')
-    } else {
-      navigate('/quiz')
-    }
   }
 
   return (
     <main>
       {message.text && (
-        <div className={`message ${message.type === 'error' ? 'error-message' : 'success-message'}`}>
+        <div 
+          className={`message ${message.type === 'error' ? 'error-message' : message.type === 'info' ? 'info-message' : 'success-message'}`}
+          role="alert"
+          aria-live="polite"
+        >
           {message.text}
         </div>
       )}
-      <section className="resources-header">
-        <h2>📚 Cybersecurity Learning Resources</h2>
+      <section className="resources-header" aria-labelledby="resources-heading">
+        <h1 id="resources-heading">📚 Cybersecurity Learning Resources</h1>
         <p>Expert-curated materials to accelerate your cybersecurity journey</p>
         <div className="resource-search">
           <form className="resource-search-form" onSubmit={(e) => e.preventDefault()}>
@@ -256,16 +169,16 @@ export default function Resources({ currentUser }){
                 <option value="advanced">Advanced</option>
               </select>
             </div>
-            <button type="submit" className="btn btn-search">Search</button>
+            <button type="submit" className="btn btn-search" aria-label="Search for resources">Search</button>
           </form>
         </div>
       </section>
 
-      <section className="featured-resources">
-        <h3>🌟 Featured Resources</h3>
-        <div className="resource-grid">
+      <section className="featured-resources" aria-labelledby="featured-heading">
+        <h2 id="featured-heading">🌟 Featured Resources</h2>
+        <div className="resource-grid" role="list" aria-label="Featured resources">
           {filteredResources.map(resource => (
-            <article key={resource.id} className={`resource-card ${resource.featured ? 'featured' : ''}`}>
+            <article key={resource.id} className={`resource-card ${resource.featured ? 'featured' : ''}`} role="listitem">
               <div className="resource-content">
                 {resource.featured && <div className="resource-badge">Most Popular</div>}
                 <div className="resource-type">{resource.type}</div>
@@ -279,15 +192,9 @@ export default function Resources({ currentUser }){
                   <span className={`level ${resource.difficulty}`}>{resource.difficulty}</span>
                 </div>
                 <div className="resource-actions">
-                  <a href={resource.url} target="_blank" rel="noreferrer" className="btn btn-primary">
+                  <a href={resource.url} target="_blank" rel="noreferrer" className="btn btn-primary" aria-label={`${resource.type === 'Tool' ? 'Access' : resource.type === 'Book' ? 'Get' : 'Watch'} ${resource.title}`}>
                     {resource.type === 'Tool' ? 'Access Tool' : resource.type === 'Book' ? 'Get Book' : 'Watch Now'}
                   </a>
-                  <button 
-                    className={`btn btn-outline ${savedResources.includes(resource.id) ? 'saved' : ''}`}
-                    onClick={() => handleSaveResource(resource.id)}
-                  >
-                    {savedResources.includes(resource.id) ? '✓ Saved' : 'Save'}
-                  </button>
                 </div>
               </div>
             </article>
@@ -295,8 +202,8 @@ export default function Resources({ currentUser }){
         </div>
       </section>
 
-      <section className="resource-categories">
-        <h3>Browse by Category</h3>
+      <section className="resource-categories" aria-labelledby="categories-heading">
+        <h2 id="categories-heading">Browse by Category</h2>
         <div className="categories-grid">
           {categories.map((category, idx) => (
             <div key={idx} className="category-card">
@@ -305,39 +212,15 @@ export default function Resources({ currentUser }){
               <p>{category.description}</p>
               <div className="category-count">{category.count} resources</div>
               <button 
+                type="button"
                 className="btn btn-outline"
-                onClick={() => handleBrowseCategory(category.title)}
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  handleBrowseCategory(category.title)
+                }}
               >
                 Browse {category.title}
-              </button>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="certification-paths">
-        <h3>Certification Learning Paths</h3>
-        <div className="cert-grid">
-          {certifications.map((cert, idx) => (
-            <div key={idx} className="cert-card">
-              <div className="cert-header">
-                <span className="cert-logo" style={{ fontSize: '2rem' }}>{cert.logo}</span>
-                <h4>{cert.name}</h4>
-              </div>
-              <p>{cert.description}</p>
-              <div className="cert-resources">
-                {cert.resources.map((resource, rIdx) => (
-                  <div key={rIdx} className="resource-item">
-                    <span className="resource-icon">{resource.icon}</span>
-                    <span>{resource.text}</span>
-                  </div>
-                ))}
-              </div>
-              <button 
-                className="btn btn-primary"
-                onClick={() => handleStartLearning(cert.name)}
-              >
-                Start Learning
               </button>
             </div>
           ))}

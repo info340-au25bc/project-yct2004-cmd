@@ -34,12 +34,15 @@ if (isFirebaseConfigured) {
     googleProvider.addScope('profile')
     googleProvider.addScope('email')
     db = getDatabase(app)
+    console.log('✅ Firebase initialized successfully!')
+    console.log('📊 Database URL:', firebaseConfig.databaseURL)
+    console.log('🔗 Database connection:', db ? 'Connected' : 'Not connected')
   } catch (error) {
-    console.error('Firebase initialization error:', error)
+    console.error('❌ Firebase initialization error:', error)
     console.warn('Firebase initialization failed. Authentication will not work.')
   }
 } else {
-  console.warn('Firebase not configured. Please set up Firebase following FIREBASE_SETUP.md')
+  console.warn('⚠️ Firebase not configured. Please set up Firebase following FIREBASE_SETUP.md')
   console.warn('Authentication features will not work until Firebase is configured.')
 }
 
