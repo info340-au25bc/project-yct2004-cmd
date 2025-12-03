@@ -9,7 +9,6 @@ export default function Ranking({ currentUser: propCurrentUser }){
   const [currentUser, setCurrentUser] = useState(propCurrentUser)
   const [loading, setLoading] = useState(true)
 
-  // Get current user if not provided
   useEffect(() => {
     if (!propCurrentUser) {
       const unsubscribe = subscribeToAuthState((user) => {
@@ -19,45 +18,40 @@ export default function Ranking({ currentUser: propCurrentUser }){
     }
   }, [propCurrentUser])
 
-  // Force refresh function
   const [refreshKey, setRefreshKey] = useState(0)
-  
+
   const forceRefresh = () => {
     setLoading(true)
     setLeaders([])
     setRefreshKey(prev => prev + 1)
   }
 
-  // Load user stats from Firebase
   useEffect(() => {
     let hasReceivedData = false
     let isMounted = true
-    
-    // Check if database is available
+
     if (!db) {
       setLoading(false)
       setLeaders([])
-      return () => {} // Return empty cleanup function
+      return () => {} 
     }
-    
-    // Set a timeout to ensure loading state resolves even if subscription fails
+
     const loadingTimeout = setTimeout(() => {
       if (!hasReceivedData && isMounted) {
         setLoading(false)
-        setLeaders([]) // Ensure empty state if no data received
+        setLeaders([]) 
       }
-    }, 3000) // 3 second timeout
-    
+    }, 3000) 
+
     let unsubscribe = null
     try {
       unsubscribe = subscribeToData('userStats', (data) => {
-        if (!isMounted) return // Don't update if component unmounted
-        
+        if (!isMounted) return 
+
         hasReceivedData = true
-        clearTimeout(loadingTimeout) // Clear timeout since we got data
-        
+        clearTimeout(loadingTimeout) 
+
         if (data && typeof data === 'object' && Object.keys(data).length > 0) {
-        // Convert Firebase object to array
           const statsArray = Object.entries(data).map(([userId, stats]) => {
             if (!stats || typeof stats !== 'object') {
               return null
@@ -73,22 +67,20 @@ export default function Ranking({ currentUser: propCurrentUser }){
           streak: stats.currentStreak || 0,
           isCurrentUser: currentUser && userId === currentUser.uid
             }
-          }).filter(Boolean) // Remove any null entries
-        
-        // Sort by points (descending) and assign ranks
+          }).filter(Boolean) 
+
         statsArray.sort((a, b) => b.points - a.points)
         statsArray.forEach((leader, index) => {
           leader.rank = index + 1
         })
-        
+
         setLeaders(statsArray)
       } else {
         setLeaders([])
       }
       setLoading(false)
     })
-      
-      // If unsubscribe is not a function, subscription failed
+
       if (typeof unsubscribe !== 'function') {
         clearTimeout(loadingTimeout)
         setLoading(false)
@@ -117,7 +109,6 @@ export default function Ranking({ currentUser: propCurrentUser }){
 
   const filteredLeaders = leaders
 
-  // Get row styling based on rank (top 3 get special colors)
   function getRowStyles(rank) {
     if (rank === 1) {
       return 'leaderboard-row leaderboard-row-gold'
@@ -129,7 +120,6 @@ export default function Ranking({ currentUser: propCurrentUser }){
     return 'leaderboard-row'
   }
 
-  // Get rank badge styling
   function getRankBadge(rank) {
     if (rank === 1) {
       return (
@@ -157,6 +147,50 @@ export default function Ranking({ currentUser: propCurrentUser }){
     )
   }
 
+  const leaderboardRows = filteredLeaders.map((leader) => (
+    <tr 
+      key={leader.id} 
+      className={`${getRowStyles(leader.rank)} ${leader.isCurrentUser ? 'leaderboard-row-current' : ''}`}
+    >
+      <td className="leaderboard-rank-cell">
+        <div className="leaderboard-rank-content">
+          {getRankBadge(leader.rank)}
+          <span className="leaderboard-rank-number">
+            {leader.rank}
+          </span>
+        </div>
+      </td>
+      <td className="leaderboard-user-cell">
+        <div className="leaderboard-user-content">
+          <div className="leaderboard-user-avatar">
+            {leader.name.charAt(0).toUpperCase()}
+          </div>
+          <div className="leaderboard-user-info">
+            <div className="leaderboard-user-name">
+              {leader.name}
+              {leader.isCurrentUser && (
+                <span className="leaderboard-user-badge">
+                  You
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+      </td>
+      <td className="leaderboard-points-cell">
+        <span className="leaderboard-points">
+          {leader.points.toLocaleString()}
+        </span>
+      </td>
+    </tr>
+  ))
+
+  const chartData = filteredLeaders.slice(0, 10).map(leader => ({
+    name: leader.name.length > 15 ? leader.name.substring(0, 12) + '...' : leader.name,
+    points: leader.points,
+    rank: leader.rank
+  }))
+
   if (loading) {
     return (
       <main className="leaderboard-page">
@@ -175,7 +209,6 @@ export default function Ranking({ currentUser: propCurrentUser }){
   return (
     <main className="leaderboard-page" aria-labelledby="leaderboard-heading">
       <div className="leaderboard-container">
-        {/* Header Card */}
         <div className="leaderboard-header-card">
           <div className="leaderboard-header-content">
             <div>
@@ -199,17 +232,12 @@ export default function Ranking({ currentUser: propCurrentUser }){
           )}
         </div>
 
-        {/* Top Performers Chart - Recharts Integration */}
         {filteredLeaders.length > 0 && (
           <div className="leaderboard-chart-card">
             <h2>📊 Top Performers Score Distribution</h2>
             <ResponsiveContainer width="100%" height={300}>
               <BarChart
-                data={filteredLeaders.slice(0, 10).map(leader => ({
-                  name: leader.name.length > 15 ? leader.name.substring(0, 12) + '...' : leader.name,
-                  points: leader.points,
-                  rank: leader.rank
-                }))}
+                data={chartData}
                 margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
               >
                 <CartesianGrid strokeDasharray="3 3" />
@@ -232,7 +260,6 @@ export default function Ranking({ currentUser: propCurrentUser }){
           </div>
         )}
 
-        {/* Leaderboard Table Card */}
         <div className="leaderboard-table-card">
           <div className="leaderboard-table-wrapper">
             <table className="leaderboard-table">
@@ -259,43 +286,7 @@ export default function Ranking({ currentUser: propCurrentUser }){
                     </td>
                   </tr>
                 ) : (
-                  filteredLeaders.map((leader) => (
-                    <tr 
-                      key={leader.id} 
-                      className={`${getRowStyles(leader.rank)} ${leader.isCurrentUser ? 'leaderboard-row-current' : ''}`}
-                    >
-                      <td className="leaderboard-rank-cell">
-                        <div className="leaderboard-rank-content">
-                          {getRankBadge(leader.rank)}
-                          <span className="leaderboard-rank-number">
-                            {leader.rank}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="leaderboard-user-cell">
-                        <div className="leaderboard-user-content">
-                          <div className="leaderboard-user-avatar">
-                            {leader.name.charAt(0).toUpperCase()}
-                          </div>
-                          <div className="leaderboard-user-info">
-                            <div className="leaderboard-user-name">
-                              {leader.name}
-                              {leader.isCurrentUser && (
-                                <span className="leaderboard-user-badge">
-                                  You
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="leaderboard-points-cell">
-                        <span className="leaderboard-points">
-                          {leader.points.toLocaleString()}
-                        </span>
-                      </td>
-                    </tr>
-                  ))
+                  leaderboardRows
                 )}
               </tbody>
             </table>
@@ -305,3 +296,4 @@ export default function Ranking({ currentUser: propCurrentUser }){
     </main>
   )
 }
+

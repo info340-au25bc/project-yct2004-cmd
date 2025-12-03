@@ -1,8 +1,6 @@
-// Firebase Realtime Database utility functions
 import { ref, push, set, onValue, off, remove } from 'firebase/database'
 import { db } from '../firebase/config'
 
-// Helper to get database reference
 function getRef(path) {
   if (!db) {
     console.warn('Firebase database not initialized')
@@ -11,7 +9,6 @@ function getRef(path) {
   return ref(db, path)
 }
 
-// Write data to Firebase
 export async function writeData(path, data) {
   try {
     const dbRef = getRef(path)
@@ -32,7 +29,6 @@ export async function writeData(path, data) {
   }
 }
 
-// Push data to Firebase (creates new entry with auto-generated key)
 export async function pushData(path, data) {
   try {
     const dbRef = getRef(path)
@@ -53,7 +49,6 @@ export async function pushData(path, data) {
   }
 }
 
-// Read data from Firebase (returns promise, one-time read)
 export function readData(path) {
   return new Promise((resolve, reject) => {
     const dbRef = getRef(path)
@@ -69,9 +64,9 @@ export function readData(path) {
         resolved = true
         console.warn('readData: Timeout reading from path:', path)
         unsubscribe()
-        resolve(null) // Return null on timeout instead of rejecting
+        resolve(null) 
       }
-    }, 10000) // 10 second timeout
+    }, 10000) 
 
     const unsubscribe = onValue(dbRef, (snapshot) => {
       if (!resolved) {
@@ -88,14 +83,12 @@ export function readData(path) {
         console.error('readData: Error reading from database:', error)
         console.error('readData: Path was:', path, 'Error code:', error?.code)
         unsubscribe()
-        // Don't reject - return null so the code can handle missing data
         resolve(null)
       }
     })
   })
 }
 
-// Subscribe to data changes (returns unsubscribe function)
 export function subscribeToData(path, callback) {
   const dbRef = getRef(path)
   if (!dbRef) {
@@ -105,7 +98,7 @@ export function subscribeToData(path, callback) {
   }
 
   console.log('👂 subscribeToData: Subscribing to path:', path)
-  
+
   onValue(dbRef, (snapshot) => {
     const data = snapshot.val()
     console.log('📥 subscribeToData: Received data from:', path, data ? 'Has data' : 'No data (null)')
@@ -117,14 +110,12 @@ export function subscribeToData(path, callback) {
     callback(null)
   })
 
-  // Return unsubscribe function
   return () => {
     console.log('🔇 subscribeToData: Unsubscribing from:', path)
     off(dbRef)
   }
 }
 
-// Delete data from Firebase
 export async function deleteData(path) {
   try {
     const dbRef = getRef(path)
@@ -137,7 +128,6 @@ export async function deleteData(path) {
   }
 }
 
-// Update specific field
 export async function updateData(path, updates) {
   try {
     const dbRef = getRef(path)

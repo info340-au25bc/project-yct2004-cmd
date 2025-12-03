@@ -63,7 +63,6 @@ export default function GroupCreation({ currentUser }){
   function handleChange(e){
     const { name, value } = e.target
     setForm(prev => ({ ...prev, [name]: value }))
-    // Clear error when user types
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }))
     }
@@ -86,7 +85,7 @@ export default function GroupCreation({ currentUser }){
   async function handleSubmit(e){
     e.preventDefault()
     if (!validateForm()) return
-    
+
     if (!currentUser) {
       setErrors({ ...errors, general: 'Please sign in to create a group' })
       return
@@ -102,11 +101,9 @@ export default function GroupCreation({ currentUser }){
       memberIds: [currentUser.uid]
     }
 
-    // Optimistic UI update
     setCreated(newGroup)
     setJoinedGroups([...joinedGroups, newGroup])
-    
-    // Reset form
+
     setForm({ 
       name: '', 
       description: '', 
@@ -117,7 +114,6 @@ export default function GroupCreation({ currentUser }){
       timezone: ''
     })
 
-    // Save to Firebase
     try {
       await pushData('studyGroups', newGroup)
       setMessage({ text: 'Group created successfully!', type: 'success' })
@@ -126,7 +122,6 @@ export default function GroupCreation({ currentUser }){
       }, 2000)
     } catch (error) {
       setMessage({ text: 'Error creating group. Please try again.', type: 'error' })
-      // Remove from local state if Firebase save failed
       setCreated(null)
       setJoinedGroups(joinedGroups.filter(g => g.id !== newGroup.id))
     }
@@ -151,13 +146,13 @@ export default function GroupCreation({ currentUser }){
         <h1>Create a Study Group</h1>
         <p>Form a study group with fellow cybersecurity learners. Choose a resource to focus on and collaborate to master the material together!</p>
       </section>
-      
+
       {message.text && (
         <div className={`message ${message.type === 'error' ? 'error-message' : 'success-message'}`} style={{ margin: '1rem', padding: '1rem', borderRadius: '8px' }}>
           {message.text}
         </div>
       )}
-      
+
       {errors.general && (
         <div className="error-message" style={{ margin: '1rem', padding: '1rem', borderRadius: '8px' }}>
           {errors.general}
@@ -181,7 +176,7 @@ export default function GroupCreation({ currentUser }){
             />
             {errors.name && <span className="error-message">{errors.name}</span>}
           </div>
-          
+
           <div className="form-group">
             <label htmlFor="group-description">Group Description:</label>
             <textarea 
@@ -193,7 +188,7 @@ export default function GroupCreation({ currentUser }){
               onChange={handleChange}
             />
           </div>
-          
+
           <div className="form-group">
             <label htmlFor="resource-selection">Select a Resource for Your Group:</label>
             <select 
@@ -211,7 +206,7 @@ export default function GroupCreation({ currentUser }){
             </select>
             {errors.resource && <span className="error-message">{errors.resource}</span>}
           </div>
-          
+
           <div className="form-row">
             <div className="form-group">
               <label htmlFor="max-members">Maximum Members:</label>
@@ -228,7 +223,7 @@ export default function GroupCreation({ currentUser }){
               />
               {errors.maxMembers && <span className="error-message">{errors.maxMembers}</span>}
             </div>
-            
+
             <div className="form-group">
               <label htmlFor="difficulty-level">Target Difficulty Level:</label>
               <select 
@@ -247,7 +242,7 @@ export default function GroupCreation({ currentUser }){
               {errors.difficulty && <span className="error-message">{errors.difficulty}</span>}
             </div>
           </div>
-          
+
           <div className="form-row">
             <div className="form-group">
               <label htmlFor="study-schedule">Preferred Study Schedule:</label>
@@ -267,7 +262,7 @@ export default function GroupCreation({ currentUser }){
               </select>
               {errors.schedule && <span className="error-message">{errors.schedule}</span>}
             </div>
-            
+
             <div className="form-group">
               <label htmlFor="timezone">Timezone:</label>
               <select 
@@ -287,7 +282,7 @@ export default function GroupCreation({ currentUser }){
               {errors.timezone && <span className="error-message">{errors.timezone}</span>}
             </div>
           </div>
-          
+
           <button type="submit" className="btn btn-primary start-quiz-btn">Create Group</button>
         </form>
 

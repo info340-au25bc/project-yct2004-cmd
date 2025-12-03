@@ -7,7 +7,6 @@ export default function Login({ currentUser, firebaseReady, onSignIn }) {
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
 
-  // Redirect if already logged in
   useEffect(() => {
     if (currentUser) {
       navigate('/')
@@ -19,24 +18,21 @@ export default function Login({ currentUser, firebaseReady, onSignIn }) {
     try {
       setError('')
       setLoading(true)
-      
-      // Check if Firebase is ready
+
       if (!firebaseReady) {
         throw new Error('Firebase is not configured. Please set up Firebase first.')
       }
-      
+
       await signInWithGoogle()
       if (onSignIn) {
         onSignIn()
       }
-      // Navigation will happen automatically via useEffect when currentUser updates
       setTimeout(() => {
         navigate('/')
       }, 100)
     } catch (err) {
       console.error('Sign in error:', err)
-      
-      // Provide helpful error messages
+
       if (err.code === 'auth/popup-closed-by-user') {
         setError('Sign-in popup was closed. Please try again.')
       } else if (err.code === 'auth/popup-blocked') {
@@ -64,7 +60,7 @@ export default function Login({ currentUser, firebaseReady, onSignIn }) {
       <div className="login-card">
         <h2>Welcome to CyberLearn</h2>
         <p>Sign in with your Google account to continue</p>
-        
+
         {!firebaseReady && (
           <div className="warning-message">
             <strong>⚠️ Firebase Not Configured</strong>
@@ -72,9 +68,9 @@ export default function Login({ currentUser, firebaseReady, onSignIn }) {
             <p>For now, you can browse the site, but authentication features won't work.</p>
           </div>
         )}
-        
+
         {error && <div className="error-message">{error}</div>}
-        
+
         <button
           onClick={handleGoogleSignIn}
           disabled={loading || !firebaseReady}
@@ -94,7 +90,7 @@ export default function Login({ currentUser, firebaseReady, onSignIn }) {
             </>
           )}
         </button>
-        
+
         <p className="login-footer">
           By signing in, you agree to our Terms of Service and Privacy Policy
         </p>

@@ -20,50 +20,41 @@ export default function TestQuestions({ currentUser }) {
   const [message, setMessage] = useState({ text: '', type: '' })
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  // Load questions from Firebase
   useEffect(() => {
     const unsubscribe = subscribeToData('questions', (data) => {
       if (data) {
-        // Convert Firebase object to array and sort by creation date (newest first)
         const questionsArray = Object.values(data)
           .filter(q => q !== null && q !== undefined)
           .sort((a, b) => {
-            // Sort by creation date, newest first
             const dateA = new Date(a.createdAt || 0).getTime()
             const dateB = new Date(b.createdAt || 0).getTime()
             return dateB - dateA
           })
-        
-        // Update questions from Firebase (will merge with any local additions)
+
         setQuestions(prev => {
-          // Create a map of existing questions by id to preserve local additions
           const existingMap = new Map()
-          
-          // First, add all existing local questions
+
           prev.forEach(q => {
             if (q && q.id) {
               existingMap.set(q.id, q)
             }
           })
-          
-          // Then, add/update questions from Firebase (Firebase data takes precedence)
+
           questionsArray.forEach(q => {
             if (q && q.id) {
               existingMap.set(q.id, q)
             }
           })
-          
-          // Convert back to array and sort
+
           const merged = Array.from(existingMap.values()).sort((a, b) => {
             const dateA = new Date(a.createdAt || 0).getTime()
             const dateB = new Date(b.createdAt || 0).getTime()
             return dateB - dateA
           })
-          
+
           return merged
         })
       } else {
-        // Only set empty if we don't have any local questions
         setQuestions(prev => prev.length > 0 ? prev : [])
       }
       setLoading(false)
@@ -72,7 +63,7 @@ export default function TestQuestions({ currentUser }) {
     return () => {
       if (unsubscribe) unsubscribe()
     }
-  }, []) // Remove questions from dependency to avoid infinite loop
+  }, []) 
 
   function handleChange(e) {
     const { name, value } = e.target
@@ -81,13 +72,11 @@ export default function TestQuestions({ currentUser }) {
 
   async function handleSubmit(e) {
     e.preventDefault()
-    
-    // Prevent double submission
+
     if (isSubmitting) {
       return
     }
 
-    // Validate all required fields
     const errors = []
     if (!formData.question?.trim()) errors.push('Question text is required')
     if (!formData.category) errors.push('Category is required')
@@ -104,7 +93,6 @@ export default function TestQuestions({ currentUser }) {
       return
     }
 
-    // Check if user is logged in
     if (!currentUser) {
       setMessage({ text: 'You must be logged in to create questions', type: 'error' })
       setTimeout(() => setMessage({ text: '', type: '' }), 3000)
@@ -131,11 +119,9 @@ export default function TestQuestions({ currentUser }) {
       feedback: []
     }
 
-    // Add question to local state immediately for instant feedback
     try {
       setQuestions(prev => [newQuestion, ...prev])
-      
-      // Reset form immediately
+
       setFormData({
         question: '',
         optionA: '',
@@ -147,24 +133,14 @@ export default function TestQuestions({ currentUser }) {
         category: '',
         difficulty: ''
       })
-      
-      // Close form
+
       setShowForm(false)
       setIsSubmitting(false)
-      
-      // Show success message
+
       setMessage({ text: 'Question created successfully!', type: 'success' })
       setTimeout(() => setMessage({ text: '', type: '' }), 5000)
-      
-      // Scroll to questions list to show the new question
-      setTimeout(() => {
-        const questionsSection = document.querySelector('.questions-list-section')
-        if (questionsSection) {
-          questionsSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
-        }
-      }, 100)
-      
-      // Save to Firebase in the background (with timeout)
+
+
       try {
         const timeoutPromise = new Promise((_, reject) =>
           setTimeout(() => reject(new Error('Firebase save timeout')), 10000)
@@ -172,7 +148,6 @@ export default function TestQuestions({ currentUser }) {
 
         const savePromise = pushData('questions', newQuestion)
         const saveResult = await Promise.race([savePromise, timeoutPromise])
-        // saveResult may be a key/string or an object; try to extract a sensible identifier
         const questionKey = saveResult && (saveResult.key || saveResult.name || saveResult)
 
         if (questionKey) {
@@ -182,8 +157,6 @@ export default function TestQuestions({ currentUser }) {
         }
       } catch (firebaseError) {
         console.error('Error saving to Firebase (but question is shown locally):', firebaseError)
-        // Don't show error to user since question is already visible
-        // The subscription will eventually sync it
       }
     } catch (error) {
       console.error('Error creating question:', error)
@@ -220,7 +193,6 @@ export default function TestQuestions({ currentUser }) {
 
   async function confirmDelete(questionId) {
     try {
-      // Find question key in Firebase
       const unsubscribe = subscribeToData('questions', async (data) => {
         if (data) {
           const questionsArray = Object.entries(data)
@@ -243,6 +215,107 @@ export default function TestQuestions({ currentUser }) {
   function cancelDelete() {
     setDeleteConfirm(null)
   }
+
+  const questionCards = questions.map(question => {
+    const feedbackItems = question.feedback && question.feedback.length > 0
+      ? question.feedback.map(fb => (
+          <div key={fb.id} className="feedback-item">
+            <div className="feedback-header">
+              <strong>{fb.author}</strong>
+              <span className="feedback-time">
+                {new Date(fb.timestamp).toLocaleDateString()}
+              </span>
+            </div>
+            <p>{fb.text}</p>
+          </div>
+        ))
+      : null
+
+    return (
+      <div key={question.id} className="question-card">
+        <div className="question-header">
+          <div className="question-meta">
+            <span className={`category-badge ${question.category}`}>
+              {question.category || 'General'}
+            </span>
+            <span className={`difficulty-badge ${question.difficulty}`}>
+              {question.difficulty || 'Not set'}
+            </span>
+          </div>
+          <button
+            onClick={() => handleDelete(question.id)}
+            className="btn-delete"
+            aria-label="Delete question"
+          >
+            🗑️ Delete
+          </button>
+          {deleteConfirm === question.id && (
+            <div className="delete-confirmation">
+              <p>Are you sure you want to delete this question?</p>
+              <button onClick={() => confirmDelete(question.id)} className="btn btn-danger">Yes, Delete</button>
+              <button onClick={cancelDelete} className="btn btn-outline">Cancel</button>
+            </div>
+          )}
+        </div>
+
+        <p className="question-text">{question.question}</p>
+
+        <div className="question-options">
+          <div className={`option ${question.correctAnswer === 'a' ? 'correct' : ''}`}>
+            <strong>A:</strong> {question.optionA}
+          </div>
+          <div className={`option ${question.correctAnswer === 'b' ? 'correct' : ''}`}>
+            <strong>B:</strong> {question.optionB}
+          </div>
+          <div className={`option ${question.correctAnswer === 'c' ? 'correct' : ''}`}>
+            <strong>C:</strong> {question.optionC}
+          </div>
+          <div className={`option ${question.correctAnswer === 'd' ? 'correct' : ''}`}>
+            <strong>D:</strong> {question.optionD}
+          </div>
+        </div>
+
+        {question.explanation && (
+          <div className="question-explanation">
+            <strong>Explanation:</strong> {question.explanation}
+          </div>
+        )}
+
+        <div className="question-footer">
+          <span className="question-author">By: {question.author}</span>
+          <span className="question-date">
+            {new Date(question.createdAt).toLocaleDateString()}
+          </span>
+        </div>
+
+        <div className="feedback-section">
+          <h4>💬 Feedback & Comments</h4>
+          <div className="feedback-form">
+            <textarea
+              value={feedback[question.id] || ''}
+              onChange={(e) => setFeedback({ ...feedback, [question.id]: e.target.value })}
+              placeholder="Provide feedback or report an issue with this question..."
+              rows="2"
+              className="feedback-input"
+            />
+            <button
+              onClick={() => handleFeedback(question.id, feedback[question.id])}
+              disabled={!feedback[question.id]?.trim()}
+              className="btn btn-sm btn-primary"
+            >
+              Submit Feedback
+            </button>
+          </div>
+
+          {question.feedback && question.feedback.length > 0 && (
+            <div className="feedback-list">
+              {feedbackItems}
+            </div>
+          )}
+        </div>
+      </div>
+    )
+  })
 
   return (
     <main className="test-questions-page">
@@ -448,104 +521,11 @@ export default function TestQuestions({ currentUser }) {
           </div>
         ) : (
           <div className="questions-list">
-            {questions.map(question => (
-              <div key={question.id} className="question-card">
-                <div className="question-header">
-                  <div className="question-meta">
-                    <span className={`category-badge ${question.category}`}>
-                      {question.category || 'General'}
-                    </span>
-                    <span className={`difficulty-badge ${question.difficulty}`}>
-                      {question.difficulty || 'Not set'}
-                    </span>
-                  </div>
-                  <button
-                    onClick={() => handleDelete(question.id)}
-                    className="btn-delete"
-                    aria-label="Delete question"
-                  >
-                    🗑️ Delete
-                  </button>
-                  {deleteConfirm === question.id && (
-                    <div className="delete-confirmation">
-                      <p>Are you sure you want to delete this question?</p>
-                      <button onClick={() => confirmDelete(question.id)} className="btn btn-danger">Yes, Delete</button>
-                      <button onClick={cancelDelete} className="btn btn-outline">Cancel</button>
-                    </div>
-                  )}
-                </div>
-
-                <p className="question-text">{question.question}</p>
-
-                <div className="question-options">
-                  <div className={`option ${question.correctAnswer === 'a' ? 'correct' : ''}`}>
-                    <strong>A:</strong> {question.optionA}
-                  </div>
-                  <div className={`option ${question.correctAnswer === 'b' ? 'correct' : ''}`}>
-                    <strong>B:</strong> {question.optionB}
-                  </div>
-                  <div className={`option ${question.correctAnswer === 'c' ? 'correct' : ''}`}>
-                    <strong>C:</strong> {question.optionC}
-                  </div>
-                  <div className={`option ${question.correctAnswer === 'd' ? 'correct' : ''}`}>
-                    <strong>D:</strong> {question.optionD}
-                  </div>
-                </div>
-
-                {question.explanation && (
-                  <div className="question-explanation">
-                    <strong>Explanation:</strong> {question.explanation}
-                  </div>
-                )}
-
-                <div className="question-footer">
-                  <span className="question-author">By: {question.author}</span>
-                  <span className="question-date">
-                    {new Date(question.createdAt).toLocaleDateString()}
-                  </span>
-                </div>
-
-                {/* Feedback Section */}
-                <div className="feedback-section">
-                  <h4>💬 Feedback & Comments</h4>
-                  <div className="feedback-form">
-                    <textarea
-                      value={feedback[question.id] || ''}
-                      onChange={(e) => setFeedback({ ...feedback, [question.id]: e.target.value })}
-                      placeholder="Provide feedback or report an issue with this question..."
-                      rows="2"
-                      className="feedback-input"
-                    />
-                    <button
-                      onClick={() => handleFeedback(question.id, feedback[question.id])}
-                      disabled={!feedback[question.id]?.trim()}
-                      className="btn btn-sm btn-primary"
-                    >
-                      Submit Feedback
-                    </button>
-                  </div>
-
-                  {question.feedback && question.feedback.length > 0 && (
-                    <div className="feedback-list">
-                      {question.feedback.map(fb => (
-                        <div key={fb.id} className="feedback-item">
-                          <div className="feedback-header">
-                            <strong>{fb.author}</strong>
-                            <span className="feedback-time">
-                              {new Date(fb.timestamp).toLocaleDateString()}
-                            </span>
-                          </div>
-                          <p>{fb.text}</p>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
+            {questionCards}
           </div>
         )}
       </section>
     </main>
   )
 }
+

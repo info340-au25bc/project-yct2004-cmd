@@ -8,7 +8,6 @@ export default function Forum({ currentUser }) {
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState({ text: '', type: '' })
 
-  // Default discussions
   const defaultDiscussions = [
     {
       id: 1,
@@ -45,12 +44,9 @@ export default function Forum({ currentUser }) {
     }
   ]
 
-  // Load discussions
   useEffect(() => {
-    // Start with defaults
     setDiscussions(defaultDiscussions)
-    
-    // Try to load from Firebase
+
     try {
       const unsubscribe = subscribeToData('discussions', (data) => {
         if (data) {
@@ -61,11 +57,10 @@ export default function Forum({ currentUser }) {
               const dateB = new Date(b.createdAt || 0).getTime()
               return dateB - dateA
             })
-          
-          // Merge with defaults (avoid duplicates)
+
           const firebaseIds = new Set(discussionsArray.map(d => d.id))
           const defaultsToAdd = defaultDiscussions.filter(d => !firebaseIds.has(d.id))
-          
+
           setDiscussions([...discussionsArray, ...defaultsToAdd])
         }
       })
@@ -82,7 +77,7 @@ export default function Forum({ currentUser }) {
 
   async function handleCreateDiscussion(e) {
     e.preventDefault()
-    
+
     if (!newDiscussion.title.trim()) {
       setMessage({ text: 'Please enter a discussion title', type: 'error' })
       setTimeout(() => setMessage({ text: '', type: '' }), 3000)
@@ -109,23 +104,57 @@ export default function Forum({ currentUser }) {
       createdAt: new Date().toISOString()
     }
 
-    // Optimistic UI update
     setDiscussions([discussion, ...discussions])
     setNewDiscussion({ title: '', content: '', category: 'General' })
     setMessage({ text: 'Discussion created successfully!', type: 'success' })
     setTimeout(() => setMessage({ text: '', type: '' }), 3000)
 
-    // Save to Firebase
     try {
       await pushData('discussions', discussion)
     } catch (error) {
       console.error('Error saving discussion:', error)
       setMessage({ text: 'Error saving discussion. Please try again.', type: 'error' })
       setTimeout(() => setMessage({ text: '', type: '' }), 3000)
-      // Remove from local state if Firebase save failed
       setDiscussions(prev => prev.filter(d => d.id !== discussion.id))
     }
   }
+
+  const discussionCards = discussions.length === 0 ? (
+    <div className="empty-state">
+      <p>No discussions yet. Be the first to start one!</p>
+    </div>
+  ) : (
+    discussions.map(discussion => {
+      const tagElements = discussion.tags && discussion.tags.length > 0
+        ? discussion.tags.map((tag, idx) => (
+            <span key={idx} className="tag">{tag}</span>
+          ))
+        : null
+
+      return (
+        <div key={discussion.id} className="discussion-card">
+          <div className="discussion-header">
+            <h4>{discussion.title}</h4>
+            <span className="category-badge">{discussion.category}</span>
+          </div>
+          <div className="discussion-meta">
+            <span>By {discussion.author}</span>
+            <span>{discussion.replies} replies</span>
+            <span>{discussion.views} views</span>
+          </div>
+          <div className="discussion-footer">
+            <div className="tags">
+              {tagElements}
+            </div>
+            <span className="last-activity">{discussion.lastActivity}</span>
+          </div>
+          <Link to={`/forum/discussion/${discussion.id}`} className="btn btn-outline">
+            View Discussion
+          </Link>
+        </div>
+      )
+    })
+  )
 
   return (
     <main className="forum-page">
@@ -150,8 +179,10 @@ export default function Forum({ currentUser }) {
           <h3>Start a New Discussion</h3>
           <form onSubmit={handleCreateDiscussion} className="discussion-form">
             <div className="form-group">
+              <label htmlFor="discussion-title">Discussion Title</label>
               <input
                 type="text"
+                id="discussion-title"
                 placeholder="Discussion title..."
                 value={newDiscussion.title}
                 onChange={(e) => setNewDiscussion({ ...newDiscussion, title: e.target.value })}
@@ -160,7 +191,9 @@ export default function Forum({ currentUser }) {
             </div>
             <div className="form-row">
               <div className="form-group">
+                <label htmlFor="discussion-category">Category</label>
                 <select
+                  id="discussion-category"
                   value={newDiscussion.category}
                   onChange={(e) => setNewDiscussion({ ...newDiscussion, category: e.target.value })}
                 >
@@ -171,7 +204,9 @@ export default function Forum({ currentUser }) {
                 </select>
               </div>
               <div className="form-group">
+                <label htmlFor="discussion-content">Content (Optional)</label>
                 <textarea
+                  id="discussion-content"
                   placeholder="Discussion content (optional)..."
                   value={newDiscussion.content || ''}
                   onChange={(e) => setNewDiscussion({ ...newDiscussion, content: e.target.value })}
@@ -193,36 +228,7 @@ export default function Forum({ currentUser }) {
             </div>
           ) : (
             <div className="discussions-grid">
-              {discussions.length === 0 ? (
-                <div className="empty-state">
-                  <p>No discussions yet. Be the first to start one!</p>
-                </div>
-              ) : (
-                discussions.map(discussion => (
-                  <div key={discussion.id} className="discussion-card">
-                    <div className="discussion-header">
-                      <h4>{discussion.title}</h4>
-                      <span className="category-badge">{discussion.category}</span>
-                    </div>
-                    <div className="discussion-meta">
-                      <span>By {discussion.author}</span>
-                      <span>{discussion.replies} replies</span>
-                      <span>{discussion.views} views</span>
-                    </div>
-                    <div className="discussion-footer">
-                      <div className="tags">
-                        {discussion.tags && discussion.tags.map((tag, idx) => (
-                          <span key={idx} className="tag">{tag}</span>
-                        ))}
-                      </div>
-                      <span className="last-activity">{discussion.lastActivity}</span>
-                    </div>
-                    <Link to={`/forum/discussion/${discussion.id}`} className="btn btn-outline">
-                      View Discussion
-                    </Link>
-                  </div>
-                ))
-              )}
+              {discussionCards}
             </div>
           )}
         </section>

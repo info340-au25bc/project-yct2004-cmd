@@ -2,7 +2,6 @@ import { initializeApp } from 'firebase/app'
 import { getAuth, GoogleAuthProvider } from 'firebase/auth'
 import { getDatabase } from 'firebase/database'
 
-// Firebase configuration from Firebase Console
 const firebaseConfig = {
   apiKey: "AIzaSyDA80Xrsp8Z4Zt54EP7dV_NQxIPCj25zsA",
   authDomain: "info340-final-project-74082.firebaseapp.com",
@@ -14,13 +13,11 @@ const firebaseConfig = {
   databaseURL: "https://info340-final-project-74082-default-rtdb.firebaseio.com/"
 }
 
-// Check if Firebase is properly configured
 const isFirebaseConfigured = firebaseConfig.apiKey && 
   firebaseConfig.apiKey !== "YOUR_API_KEY" &&
   firebaseConfig.projectId && 
   firebaseConfig.projectId !== "YOUR_PROJECT_ID"
 
-// Initialize Firebase
 let app = null
 let auth = null
 let googleProvider = null
@@ -46,6 +43,5 @@ if (isFirebaseConfigured) {
   console.warn('Authentication features will not work until Firebase is configured.')
 }
 
-// Export Firebase services
 export { auth, googleProvider, db, isFirebaseConfigured }
 export default app

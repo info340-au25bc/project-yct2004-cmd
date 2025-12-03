@@ -3,7 +3,6 @@ import { Link, useParams } from 'react-router-dom'
 import CommentSection from '../components/CommentSection'
 import { pushData, writeData, readData } from '../utils/database'
 
-// Expanded quiz database
 const allQuizzes = {
   'network-security': {
     id: 'network-security',
@@ -321,7 +320,6 @@ export default function QuizPage({ currentUser }){
     return acc + (answers[qId] === q?.correct ? 1 : 0)
   }, 0)
 
-  // Sync URL param with state (only when URL param changes, not on manual selection)
   useEffect(() => {
     if (quizId && quizId !== selectedQuizId && allQuizzes[quizId]) {
       setSelectedQuizId(quizId)
@@ -332,17 +330,14 @@ export default function QuizPage({ currentUser }){
       setSubmitted(false)
       setShowResults(false)
     }
-  }, [quizId, selectedQuizId]) // Only depend on quizId, not selectedQuizId
+  }, [quizId, selectedQuizId]) 
 
-  // Define updateUserStats function before useEffect
   async function updateUserStats(userId, correctAnswers, totalQuestions, pointsEarned, duration = 0) {
     try {
       const statsPath = `userStats/${userId}`
-      
-      // Read current stats
+
       const currentStats = await readData(statsPath)
-      
-      // Initialize stats if they don't exist
+
       const baseStats = {
         userId: userId,
         userName: currentUser?.displayName || currentUser?.email || 'Anonymous',
@@ -354,38 +349,31 @@ export default function QuizPage({ currentUser }){
         lastQuizDate: null,
         createdAt: new Date().toISOString()
       }
-      
+
       const existingStats = currentStats || baseStats
-      
-      // Calculate new stats
+
       const today = new Date().toDateString()
       const lastDate = existingStats.lastQuizDate ? new Date(existingStats.lastQuizDate).toDateString() : null
       const yesterday = new Date(Date.now() - 86400000).toDateString()
-      
-      // Calculate streak
+
       let newStreak = existingStats.currentStreak || 0
       if (!lastDate) {
         newStreak = 1
       } else if (lastDate === today) {
-        // Same day, keep streak
         newStreak = existingStats.currentStreak || 0
       } else if (lastDate === yesterday) {
-        // Consecutive day, increment streak
         newStreak = (existingStats.currentStreak || 0) + 1
       } else {
-        // Streak broken, reset to 1
         newStreak = 1
       }
-      
-      // Calculate average duration
+
       const totalDuration = (existingStats.totalDuration || 0) + duration
       const quizCount = (existingStats.totalQuizzes || 0) + 1
       const averageDuration = quizCount > 0 ? Math.round(totalDuration / quizCount) : duration
-      
+
       const updatedStats = {
         ...baseStats,
         ...existingStats,
-        // Preserve or update userName
         userName: existingStats.userName || currentUser?.displayName || currentUser?.email || 'Anonymous',
         userId: userId,
         totalPoints: (existingStats.totalPoints || 0) + pointsEarned,
@@ -398,13 +386,11 @@ export default function QuizPage({ currentUser }){
         lastQuizDate: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       }
-      
-      // Calculate accuracy
+
       updatedStats.accuracy = updatedStats.totalQuestions > 0 
         ? Math.round((updatedStats.totalCorrect / updatedStats.totalQuestions) * 100)
         : 0
-      
-      // Save updated stats
+
       await writeData(statsPath, updatedStats)
       return updatedStats
     } catch (error) {
@@ -413,22 +399,19 @@ export default function QuizPage({ currentUser }){
     }
   }
 
-  // Save quiz results to Firebase when quiz is completed
   useEffect(() => {
     if (showResults && currentUser && currentUser.uid) {
       console.log('📝 Quiz completed! Starting to save to Firebase...')
       console.log('👤 User:', currentUser.displayName || currentUser.email)
       console.log('🆔 User ID:', currentUser.uid)
-      
+
       const percentage = Math.round((score / totalQuestions) * 100)
       const pointsEarned = score * 100
-      
-      // Calculate quiz duration in seconds
+
       const duration = quizStartTime 
         ? Math.round((new Date() - quizStartTime) / 1000) 
         : 0
-      
-      // Save quiz result
+
       const quizResult = {
         userId: currentUser.uid,
         userName: currentUser.displayName || currentUser.email || 'Anonymous',
@@ -438,16 +421,16 @@ export default function QuizPage({ currentUser }){
         totalQuestions: totalQuestions,
         percentage: percentage,
         points: pointsEarned,
-        duration: duration, // Duration in seconds
+        duration: duration, 
         timestamp: new Date().toISOString(),
         answers: answers
       }
-      
+
       console.log('💾 Saving quiz result to Firebase:', {
         path: 'quizResults',
         data: quizResult
       })
-      
+
       pushData('quizResults', quizResult)
         .then((key) => {
           console.log('✅ Quiz result saved successfully! Key:', key)
@@ -457,8 +440,7 @@ export default function QuizPage({ currentUser }){
           console.error('❌ Error saving quiz result:', error)
           console.error('Error details:', error.message, error.code)
         })
-      
-      // Update user stats
+
       console.log('📊 Updating user stats in Firebase...')
       updateUserStats(currentUser.uid, score, totalQuestions, pointsEarned, duration)
         .then((updatedStats) => {
@@ -470,7 +452,6 @@ export default function QuizPage({ currentUser }){
         .catch(error => {
           console.error('❌ Failed to update user stats:', error)
           console.error('Error details:', error.message, error.code)
-          // Try to save a simplified version directly
           const fallbackStats = {
             userId: currentUser.uid,
             userName: currentUser.displayName || currentUser.email || 'Anonymous',
@@ -530,7 +511,6 @@ export default function QuizPage({ currentUser }){
       console.error('Quiz not found or invalid:', quizId)
       return
     }
-    // Reset all state before starting quiz
     setSelectedQuizId(quizId)
     setCurrentQuestion(0)
     setSelected('')
@@ -539,7 +519,7 @@ export default function QuizPage({ currentUser }){
     setShowResults(false)
     setShowQuizSelector(false)
     setStatsSaved(false)
-    setQuizStartTime(new Date()) // Track when quiz starts
+    setQuizStartTime(new Date()) 
   }
 
   if (showQuizSelector) {
@@ -656,12 +636,7 @@ export default function QuizPage({ currentUser }){
     )
   }
 
-  // Safety check: only show error if we're trying to display quiz but data is invalid
-  // If showQuizSelector is true, we'll show selector (handled above)
-  // If showResults is true, we'll show results (handled above)  
-  // Otherwise, we should show the quiz - but only if data is valid
   if (!showQuizSelector && !showResults) {
-    // Validate quiz data exists
     if (!currentQuiz || !currentQuiz.questions || currentQuiz.questions.length === 0) {
       return (
         <main>
@@ -680,12 +655,9 @@ export default function QuizPage({ currentUser }){
         </main>
       )
     }
-    
-    // Ensure currentQuestion index is valid - fix it if needed
+
     if (currentQuestion < 0 || currentQuestion >= currentQuiz.questions.length) {
-      // Reset to first question if index is invalid
       setCurrentQuestion(0)
-      // Return early to let state update, component will re-render
       return (
         <main>
           <section className="quiz-header">
@@ -696,8 +668,7 @@ export default function QuizPage({ currentUser }){
         </main>
       )
     }
-    
-    // Final validation: question must exist
+
     if (!question) {
       return (
         <main>
@@ -717,6 +688,42 @@ export default function QuizPage({ currentUser }){
       )
     }
   }
+
+  const answerOptions = question?.options?.map(opt => (
+    <label key={opt.id} className="option-label">
+      <input 
+        type="radio" 
+        name="answer" 
+        value={opt.id} 
+        className="option-input"
+        checked={selected === opt.id}
+        onChange={() => setSelected(opt.id)}
+        aria-label={`Option ${opt.id}: ${opt.text}`}
+      />
+      <span className="option-text">{opt.text}</span>
+    </label>
+  ))
+
+  const questionNumbers = currentQuiz?.questions?.map((q, idx) => {
+    const status = idx === currentQuestion ? 'current' : 
+                  answers[q.id] ? 'completed' : ''
+    return (
+      <span 
+        key={q.id} 
+        className={`q-number ${status}`}
+        onClick={() => {
+          if (idx >= 0 && idx < totalQuestions) {
+            setCurrentQuestion(idx)
+            setSelected(answers[q.id] || '')
+            setSubmitted(!!answers[q.id])
+          }
+        }}
+        aria-label={`Question ${idx + 1}${status === 'current' ? ' (current)' : status === 'completed' ? ' (completed)' : ''}`}
+      >
+        {idx + 1}
+      </span>
+    )
+  })
 
   return (
     <main>
@@ -755,7 +762,7 @@ export default function QuizPage({ currentUser }){
           <div className="question-header">
             <h2 id="question-heading">Question {currentQuestion + 1}</h2>
           </div>
-          
+
           <div className="question-content" role="region" aria-live="polite">
             <p>{question?.text || 'Loading question...'}</p>
           </div>
@@ -764,20 +771,7 @@ export default function QuizPage({ currentUser }){
             <fieldset>
               <legend className="sr-only">Answer options</legend>
               <div className="answer-options" role="radiogroup" aria-labelledby="question-heading">
-              {question?.options?.map(opt => (
-                <label key={opt.id} className="option-label">
-                  <input 
-                    type="radio" 
-                    name="answer" 
-                    value={opt.id} 
-                    className="option-input"
-                    checked={selected === opt.id}
-                    onChange={() => setSelected(opt.id)}
-                    aria-label={`Option ${opt.id}: ${opt.text}`}
-                  />
-                  <span className="option-text">{opt.text}</span>
-                </label>
-              ))}
+              {answerOptions}
             </div>
 
             {submitted && question && (
@@ -838,25 +832,7 @@ export default function QuizPage({ currentUser }){
         <div className="question-list">
           <h4>Question Overview</h4>
           <div className="question-numbers">
-            {currentQuiz?.questions?.map((q, idx) => {
-              const status = idx === currentQuestion ? 'current' : 
-                            answers[q.id] ? 'completed' : ''
-              return (
-                <span 
-                  key={q.id} 
-                  className={`q-number ${status}`}
-                  onClick={() => {
-                    if (idx >= 0 && idx < totalQuestions) {
-                    setCurrentQuestion(idx)
-                    setSelected(answers[q.id] || '')
-                    setSubmitted(false)
-                    }
-                  }}
-                >
-                  {idx + 1}
-                </span>
-              )
-            })}
+            {questionNumbers}
           </div>
         </div>
       </section>

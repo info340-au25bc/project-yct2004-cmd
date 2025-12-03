@@ -87,21 +87,38 @@ export default function Home(){
     return matchesQuery && matchesLevel
   })
 
+  const quizCards = filtered.map(q => (
+    <article className="quiz-card" key={q.id} role="listitem">
+      <div className="quiz-image">
+        <img src={q.image} alt={`${q.title} quiz preview`} className="card-img" />
+      </div>
+      <div className="quiz-content">
+        <h4>{q.title}</h4>
+        <p>{q.description}</p>
+        <div className="quiz-meta">
+          <span className={`difficulty ${q.difficulty}`}>{q.difficulty}</span>
+          <span className="questions">{q.questions} Questions</span>
+          <span className="rating">★★★★☆ ({q.rating})</span>
+        </div>
+        <Link to={`/quiz/${q.id}`} className="btn btn-card" aria-label={`Take ${q.title} quiz`}>Take Quiz</Link>
+      </div>
+    </article>
+  ))
+
+  const groupCards = studyGroups.map(group => (
+    <div className="group-card" key={group.id}>
+      <h4>{group.name}</h4>
+      <p>{group.description}</p>
+      <div className="group-meta">
+        <span className="members">{group.members} members</span>
+        <span className="next-session">Next: {group.nextSession}</span>
+      </div>
+      <Link to="/login" className="btn btn-outline">Join Group</Link>
+    </div>
+  ))
+
   return (
     <main>
-      {/* Hero Section */}
-      <section className="hero" aria-labelledby="hero-heading">
-        <div className="hero-content">
-          <h1 id="hero-heading">Master Cybersecurity Through Interactive Learning</h1>
-          <p>Join thousands of learners preparing for CompTIA Security+ and other cybersecurity certifications through community-driven quizzes, study groups, and expert-curated resources.</p>
-          <div className="hero-buttons">
-            <Link to="/quiz" className="btn btn-primary">Start Learning</Link>
-            <Link to="/resources" className="btn btn-secondary">Browse Resources</Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Search and Filter Section */}
       <section className="search-section" aria-labelledby="search-heading">
         <h2 id="search-heading">Find Your Perfect Study Material</h2>
         <form className="search-form" role="search" onSubmit={(e) => e.preventDefault()}>
@@ -149,31 +166,6 @@ export default function Home(){
         </form>
       </section>
 
-      {/* Featured Quizzes Section */}
-      <section className="featured-section" aria-labelledby="quizzes-heading">
-        <h2 id="quizzes-heading">Featured Quizzes</h2>
-        <div className="quiz-grid" role="list" aria-label="Featured quizzes">
-          {filtered.map(q => (
-            <article className="quiz-card" key={q.id} role="listitem">
-              <div className="quiz-image">
-                <img src={q.image} alt={`${q.title} quiz preview`} className="card-img" />
-              </div>
-              <div className="quiz-content">
-                <h4>{q.title}</h4>
-                <p>{q.description}</p>
-                <div className="quiz-meta">
-                  <span className={`difficulty ${q.difficulty}`}>{q.difficulty}</span>
-                  <span className="questions">{q.questions} Questions</span>
-                  <span className="rating">★★★★☆ ({q.rating})</span>
-                </div>
-                <Link to={`/quiz/${q.id}`} className="btn btn-card" onClick={() => window.scrollTo(0, 0)} aria-label={`Take ${q.title} quiz`}>Take Quiz</Link>
-              </div>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      {/* Statistics Section */}
       <section className="stats-section" aria-labelledby="stats-heading">
         <h2 id="stats-heading">Join Our Growing Community</h2>
         <div className="stats-grid">
@@ -196,23 +188,20 @@ export default function Home(){
         </div>
       </section>
 
-      {/* Study Groups Section */}
+      <section className="quizzes-section" aria-labelledby="quizzes-heading">
+        <h2 id="quizzes-heading">Featured Quizzes</h2>
+        <div className="quizzes-grid" role="list" aria-label="Available quizzes">
+          {quizCards}
+        </div>
+      </section>
+
       <section className="study-groups-section" aria-labelledby="groups-heading">
-        <h2 id="groups-heading">Join Study Groups</h2>
+        <h2 id="groups-heading">Active Study Groups</h2>
         <div className="groups-grid">
-          {studyGroups.map(group => (
-            <div className="group-card" key={group.id}>
-              <h4>{group.name}</h4>
-              <p>{group.description}</p>
-              <div className="group-meta">
-                <span className="members">{group.members} members</span>
-                <span className="next-session">Next: {group.nextSession}</span>
-              </div>
-              <Link to="/login" className="btn btn-outline">Join Group</Link>
-            </div>
-          ))}
+          {groupCards}
         </div>
       </section>
     </main>
   )
 }
+

@@ -14,7 +14,6 @@ import TestQuestions from './pages/TestQuestions'
 import Forum from './pages/Forum'
 import DiscussionDetail from './pages/DiscussionDetail'
 
-// Protected Route Component
 function ProtectedRoute({ children, currentUser }) {
   return currentUser ? children : <Navigate to="/login" />
 }
@@ -79,7 +78,6 @@ export default function App(){
   const [loading, setLoading] = useState(true)
   const [firebaseReady, setFirebaseReady] = useState(false)
 
-  // Check Firebase configuration
   useEffect(() => {
     const ready = isFirebaseReady()
     setFirebaseReady(ready)
@@ -90,7 +88,6 @@ export default function App(){
     }
   }, [])
 
-  // Subscribe to auth state changes
   useEffect(() => {
     const unsubscribe = subscribeToAuthState((user) => {
       setCurrentUser(user)
@@ -100,18 +97,13 @@ export default function App(){
     return unsubscribe
   }, [])
 
-  // Sign in handler
   async function handleSignIn() {
-    // This will be called from Login component
-    // Auth state will update automatically via subscribeToAuthState
   }
 
-  // Logout handler
   async function handleLogout() {
     const { logout } = await import('./utils/auth')
     try {
       await logout()
-      // Auth state will update automatically via subscribeToAuthState
     } catch (error) {
       console.error('Failed to log out:', error)
     }

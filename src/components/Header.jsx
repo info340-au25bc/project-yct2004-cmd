@@ -75,7 +75,7 @@ export default function Header({ currentUser, firebaseReady, onLogout }) {
           {currentUser ? (
             <div className="user-info">
               <img 
-                src={currentUser.photoURL || 'https://via.placeholder.com/32'} 
+                src={currentUser.photoURL || 'https://via.placeholder.com/40'}
                 alt={currentUser.displayName || 'User'} 
                 className="user-avatar"
               />

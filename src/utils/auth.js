@@ -1,4 +1,3 @@
-// Authentication utility functions (no Context API)
 import { 
   signInWithPopup, 
   signOut, 
@@ -6,7 +5,6 @@ import {
 } from 'firebase/auth'
 import { auth, googleProvider, isFirebaseConfigured } from '../firebase/config'
 
-// Sign in with Google
 export async function signInWithGoogle() {
   if (!isFirebaseConfigured || !auth || !googleProvider) {
     throw new Error('Firebase is not configured. Please set up Firebase first.')
@@ -24,7 +22,6 @@ export async function signInWithGoogle() {
   }
 }
 
-// Sign out
 export async function logout() {
   if (!isFirebaseConfigured || !auth) {
     return
@@ -38,7 +35,6 @@ export async function logout() {
   }
 }
 
-// Subscribe to auth state changes
 export function subscribeToAuthState(callback) {
   if (!isFirebaseConfigured || !auth) {
     callback(null)
@@ -51,7 +47,6 @@ export function subscribeToAuthState(callback) {
   })
 }
 
-// Check if Firebase is ready
 export function isFirebaseReady() {
   return isFirebaseConfigured && auth !== null
 }

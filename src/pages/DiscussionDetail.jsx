@@ -12,7 +12,6 @@ export default function DiscussionDetail({ currentUser }) {
   const [message, setMessage] = useState({ text: '', type: '' })
 
   useEffect(() => {
-    // Default discussions (fallback)
     const defaultDiscussions = [
       {
         id: 1,
@@ -52,7 +51,6 @@ export default function DiscussionDetail({ currentUser }) {
       }
     ]
 
-    // Load discussion from Firebase
     const unsubscribeDiscussions = subscribeToData('discussions', (data) => {
       if (data) {
         const discussionsArray = Object.values(data)
@@ -61,7 +59,6 @@ export default function DiscussionDetail({ currentUser }) {
           setDiscussion(foundDiscussion)
           setLoading(false)
         } else {
-          // Check default discussions if not in Firebase
           const defaultDiscussion = defaultDiscussions.find(d => d.id === parseInt(id))
           if (defaultDiscussion) {
             setDiscussion(defaultDiscussion)
@@ -69,7 +66,6 @@ export default function DiscussionDetail({ currentUser }) {
           setLoading(false)
         }
       } else {
-        // No Firebase data, check defaults
         const defaultDiscussion = defaultDiscussions.find(d => d.id === parseInt(id))
         if (defaultDiscussion) {
           setDiscussion(defaultDiscussion)
@@ -78,7 +74,6 @@ export default function DiscussionDetail({ currentUser }) {
       }
     })
 
-    // Load replies from Firebase
     const unsubscribeReplies = subscribeToData(`discussionReplies/${id}`, (data) => {
       if (data) {
         const repliesArray = Object.values(data)
@@ -122,15 +117,12 @@ export default function DiscussionDetail({ currentUser }) {
       avatar: currentUser.photoURL || 'https://via.placeholder.com/40'
     }
 
-    // Add reply to local state immediately
     const updatedReplies = [...replies, reply]
     setReplies(updatedReplies)
 
     try {
-      // Save reply to Firebase
       await pushData(`discussionReplies/${id}`, reply)
-      
-      // Update discussion reply count in Firebase
+
       if (discussion) {
         const updatedDiscussion = {
           ...discussion,
@@ -138,8 +130,7 @@ export default function DiscussionDetail({ currentUser }) {
           lastActivity: new Date().toISOString()
         }
         setDiscussion(updatedDiscussion)
-        
-        // Update in Firebase
+
         try {
           const unsubscribe = subscribeToData('discussions', async (data) => {
             if (data) {
@@ -152,17 +143,15 @@ export default function DiscussionDetail({ currentUser }) {
             if (unsubscribe) unsubscribe()
           })
         } catch (error) {
-          // Firebase update failed, but that's okay - reply is saved
         }
       }
-      
+
       setNewReply('')
       setMessage({ text: 'Reply posted successfully!', type: 'success' })
       setTimeout(() => setMessage({ text: '', type: '' }), 3000)
     } catch (error) {
       setMessage({ text: 'Error posting reply. Please try again.', type: 'error' })
       setTimeout(() => setMessage({ text: '', type: '' }), 3000)
-      // Remove from local state if Firebase save failed
       setReplies(replies)
     }
   }
@@ -217,7 +206,7 @@ export default function DiscussionDetail({ currentUser }) {
             <div className="discussion-meta-info">
               <div className="author-info">
                 <img 
-                  src="https://via.placeholder.com/40" 
+                  src="https://via.placeholder.com/40"
                   alt={discussion.author} 
                   className="author-avatar"
                 />
@@ -281,7 +270,7 @@ export default function DiscussionDetail({ currentUser }) {
             <form onSubmit={handleSubmitReply} className="reply-form">
               <div className="reply-form-header">
                 <img 
-                  src={currentUser.photoURL || 'https://via.placeholder.com/40'} 
+                  src={currentUser.photoURL || 'https://via.placeholder.com/40'}
                   alt={currentUser.displayName || 'You'} 
                   className="reply-form-avatar"
                 />

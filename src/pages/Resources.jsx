@@ -84,34 +84,68 @@ export default function Resources({ currentUser }){
   })
 
   function handleBrowseCategory(categoryTitle) {
-    // Filter resources by category type
     const categoryMap = {
       'Video Courses': 'Video Course',
       'Books & eBooks': 'Book',
       'Tools & Software': 'Tool',
       'Articles & Blogs': 'Article'
     }
-    
+
     const type = categoryMap[categoryTitle] || ''
     setResourceType(type)
     setSearchQuery('')
     setDifficulty('')
-    
-    // Show feedback message
+
     setMessage({ 
       text: `Showing ${categoryTitle.toLowerCase()}. Scroll down to see filtered resources.`, 
       type: 'info' 
     })
     setTimeout(() => setMessage({ text: '', type: '' }), 3000)
-    
-    // Scroll to resources section
-    setTimeout(() => {
-      const resourcesSection = document.querySelector('.featured-resources')
-      if (resourcesSection) {
-        resourcesSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
-      }
-    }, 100)
+
   }
+
+  const resourceCards = filteredResources.map(resource => (
+    <article key={resource.id} className={`resource-card ${resource.featured ? 'featured' : ''}`} role="listitem">
+      <div className="resource-content">
+        {resource.featured && <div className="resource-badge">Most Popular</div>}
+        <div className="resource-type">{resource.type}</div>
+        <h4>{resource.title}</h4>
+        <p>{resource.description}</p>
+        <div className="resource-meta">
+          {resource.duration && <span className="duration">{resource.duration}</span>}
+          {resource.pages && <span className="pages">{resource.pages}</span>}
+          {resource.courses && <span className="courses">{resource.courses}</span>}
+          {resource.rating && <span className="rating">★★★★☆ ({resource.rating})</span>}
+          <span className={`level ${resource.difficulty}`}>{resource.difficulty}</span>
+        </div>
+        <div className="resource-actions">
+          <a href={resource.url} target="_blank" rel="noreferrer" className="btn btn-primary" aria-label={`${resource.type === 'Tool' ? 'Access' : resource.type === 'Book' ? 'Get' : 'Watch'} ${resource.title}`}>
+            {resource.type === 'Tool' ? 'Access Tool' : resource.type === 'Book' ? 'Get Book' : 'Watch Now'}
+          </a>
+        </div>
+      </div>
+    </article>
+  ))
+
+  const categoryCards = categories.map((category, idx) => (
+    <div key={idx} className="category-card">
+      <div className="category-icon">{category.icon}</div>
+      <h4>{category.title}</h4>
+      <p>{category.description}</p>
+      <div className="category-count">{category.count} resources</div>
+      <button 
+        type="button"
+        className="btn btn-outline"
+        onClick={(e) => {
+          e.preventDefault()
+          e.stopPropagation()
+          handleBrowseCategory(category.title)
+        }}
+      >
+        Browse {category.title}
+      </button>
+    </div>
+  ))
 
   return (
     <main>
@@ -177,53 +211,14 @@ export default function Resources({ currentUser }){
       <section className="featured-resources" aria-labelledby="featured-heading">
         <h2 id="featured-heading">🌟 Featured Resources</h2>
         <div className="resource-grid" role="list" aria-label="Featured resources">
-          {filteredResources.map(resource => (
-            <article key={resource.id} className={`resource-card ${resource.featured ? 'featured' : ''}`} role="listitem">
-              <div className="resource-content">
-                {resource.featured && <div className="resource-badge">Most Popular</div>}
-                <div className="resource-type">{resource.type}</div>
-                <h4>{resource.title}</h4>
-                <p>{resource.description}</p>
-                <div className="resource-meta">
-                  {resource.duration && <span className="duration">{resource.duration}</span>}
-                  {resource.pages && <span className="pages">{resource.pages}</span>}
-                  {resource.courses && <span className="courses">{resource.courses}</span>}
-                  {resource.rating && <span className="rating">★★★★☆ ({resource.rating})</span>}
-                  <span className={`level ${resource.difficulty}`}>{resource.difficulty}</span>
-                </div>
-                <div className="resource-actions">
-                  <a href={resource.url} target="_blank" rel="noreferrer" className="btn btn-primary" aria-label={`${resource.type === 'Tool' ? 'Access' : resource.type === 'Book' ? 'Get' : 'Watch'} ${resource.title}`}>
-                    {resource.type === 'Tool' ? 'Access Tool' : resource.type === 'Book' ? 'Get Book' : 'Watch Now'}
-                  </a>
-                </div>
-              </div>
-            </article>
-          ))}
+          {resourceCards}
         </div>
       </section>
 
       <section className="resource-categories" aria-labelledby="categories-heading">
         <h2 id="categories-heading">Browse by Category</h2>
         <div className="categories-grid">
-          {categories.map((category, idx) => (
-            <div key={idx} className="category-card">
-              <div className="category-icon">{category.icon}</div>
-              <h4>{category.title}</h4>
-              <p>{category.description}</p>
-              <div className="category-count">{category.count} resources</div>
-              <button 
-                type="button"
-                className="btn btn-outline"
-                onClick={(e) => {
-                  e.preventDefault()
-                  e.stopPropagation()
-                  handleBrowseCategory(category.title)
-                }}
-              >
-                Browse {category.title}
-              </button>
-            </div>
-          ))}
+          {categoryCards}
         </div>
       </section>
 
