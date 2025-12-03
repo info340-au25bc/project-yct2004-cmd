@@ -10,7 +10,7 @@ export default function Login({ currentUser, firebaseReady, onSignIn }) {
   // Redirect if already logged in
   useEffect(() => {
     if (currentUser) {
-      navigate('/forum')
+      navigate('/')
     }
   }, [currentUser, navigate])
 
@@ -31,7 +31,7 @@ export default function Login({ currentUser, firebaseReady, onSignIn }) {
       }
       // Navigation will happen automatically via useEffect when currentUser updates
       setTimeout(() => {
-        navigate('/forum')
+        navigate('/')
       }, 100)
     } catch (err) {
       console.error('Sign in error:', err)

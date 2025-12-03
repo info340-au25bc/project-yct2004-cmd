@@ -3116,6 +3116,17 @@ select:focus {
   margin: 0 auto;
 }
 
+.loading-state {
+  text-align: center;
+  padding: 3rem;
+  color: var(--text-secondary);
+}
+
+.loading-state p {
+  margin: 0.5rem 0;
+  font-size: 1.1rem;
+}
+
 .forum-header {
   display: flex;
   justify-content: space-between;
